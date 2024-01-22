@@ -2,8 +2,8 @@ version: '3.8'
 
 services:
   server:
-    container_name: server
     build: server
+    container_name: server
     restart: always
     ports:
       - 8000:8000
@@ -14,8 +14,8 @@ services:
       - app_network
 
   mariadb:
-    container_name: mariadb
     image: mariadb
+    container_name: mariadb
     restart: always
     environment:
       - MARIADB_DATABASE=mysql_db
@@ -68,6 +68,22 @@ services:
       - ME_CONFIG_MONGODB_SERVER=mongodb
     depends_on:
       - mongodb
+    networks:
+      - app_network
+
+  llm:
+    build: llm
+    container_name: llm
+    restart: always
+    ports:
+      - 8080:8080
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     networks:
       - app_network
 
