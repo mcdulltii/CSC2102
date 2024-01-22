@@ -13,8 +13,9 @@ model = None
 
 def drsamantha_init() -> None:
     global tokenizer, model
-    tokenizer = AutoTokenizer.from_pretrained("sethuiyer/Dr_Samantha-7b")
-    model = AutoModelForCausalLM.from_pretrained("sethuiyer/Dr_Samantha-7b").to("cuda")
+    print("init drsamantha")
+    tokenizer = AutoTokenizer.from_pretrained("TheBloke/Dr_Samantha-7B-GPTQ", device_map = 'cuda')
+    model = AutoModelForCausalLM.from_pretrained("TheBloke/Dr_Samantha-7B-GPTQ", device_map = 'cuda')
 
 
 def drsamantha_infer(
@@ -26,6 +27,7 @@ def drsamantha_infer(
         **kwargs,
 ) -> str:
     global tokenizer, model
+
     inputs = tokenizer(prompt, return_tensors="pt")
     input_ids = inputs["input_ids"].to("cuda")
     attention_mask = inputs["attention_mask"].to("cuda")
@@ -49,6 +51,7 @@ def drsamantha_infer(
         )
     s = generation_output.sequences[0]
     output = tokenizer.decode(s, skip_special_tokens=True)
+    torch.cuda.empty_cache()
     return output
 
 
