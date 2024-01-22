@@ -12,6 +12,8 @@ SIT CSC2101 (Professional Software Development and Team Project 2)
 
 4. At least 8GB of VRAM on your graphics card with 16GB of shared memory swap space
 
+5. Installed ```docker AND docker-compose``` or have ```docker desktop with wsl2 integration (Ubuntu)```
+
 ## Quick debugging checks
 1. Run as admin in Windows Powershell, run wsl -l -v to check what sub-systems you have and ensure that they are version 2
 
@@ -38,7 +40,7 @@ SIT CSC2101 (Professional Software Development and Team Project 2)
 
 ## Docker Setup For GPU usage
 
-1. Using a web browser, download Docker-desktop from their [website](https://www.docker.com/products/docker-desktop/) and install ```docker``` and ```docker-compose``` to run the microservice containers
+1. If you have yet to do so, use a web browser, download Docker-desktop from their [website](https://www.docker.com/products/docker-desktop/) and install ```docker``` and ```docker-compose``` to run the microservice containers
 
 2. Using wsl, and following the cloud-native guide provided by [Nvidia](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt) to enable docker for cuda ready workloads
 
