@@ -77,6 +77,8 @@ services:
     restart: always
     ports:
       - 8080:8080
+    volumes:
+      - ./uvicorn_data:/server/data
     deploy:
       resources:
         reservations:
