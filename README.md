@@ -46,7 +46,7 @@ SIT CSC2101 (Professional Software Development and Team Project 2)
 
     - 2. Configuring the [docker daemon and containerd](./images/docker_daemon.png)
 
-3. Check for successful installation by running ```sudo docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi```, if a table like [this](./images/nvidiasmi.png) does not show up as an echo from your docker container, perhaps you have missed a step somewhere in the installation process.
+3. Check for successful installation by running ```sudo docker run --rm --gpus all ubuntu nvidia-smi```, if a table like [this](./images/nvidiasmi.png) does not show up as an echo from your docker container, perhaps you have missed a step somewhere in the installation process.
 
 ## Running the services
 1. cd CSC2102
