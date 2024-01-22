@@ -5,15 +5,22 @@ import asyncio
 import torch
 import tensorflow as tf
 from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
-from typing import Dict, List
+import logging
 
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 tokenizer = None
 model = None
+prompt_fmt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
+
+### Instruction:
+%s
+
+### Response:
+"""
 
 
 def drsamantha_init() -> None:
     global tokenizer, model
-    print("init drsamantha")
     tokenizer = AutoTokenizer.from_pretrained("TheBloke/Dr_Samantha-7B-GPTQ", device_map = 'cuda')
     model = AutoModelForCausalLM.from_pretrained("TheBloke/Dr_Samantha-7B-GPTQ", device_map = 'cuda')
 
@@ -27,7 +34,6 @@ def drsamantha_infer(
         **kwargs,
 ) -> str:
     global tokenizer, model
-
     inputs = tokenizer(prompt, return_tensors="pt")
     input_ids = inputs["input_ids"].to("cuda")
     attention_mask = inputs["attention_mask"].to("cuda")
@@ -52,14 +58,16 @@ def drsamantha_infer(
     s = generation_output.sequences[0]
     output = tokenizer.decode(s, skip_special_tokens=True)
     torch.cuda.empty_cache()
-    return output
+    return output.split(" Response:")[1]
 
 
 async def get_model_inference(request) -> JSONResponse:
+    global prompt_fmt
     payload = await request.body()
     string = payload.decode("utf-8")
+    logging.debug(f"Received POST: {string}")
     response_q = asyncio.Queue()
-    await request.app.model_queue.put((string, response_q))
+    await request.app.model_queue.put((prompt_fmt.format(string), response_q))
     output = await response_q.get()
     return JSONResponse(output)
 
@@ -67,7 +75,9 @@ async def get_model_inference(request) -> JSONResponse:
 async def server_loop(q) -> None:
     while True:
         (string, response_q) = await q.get()
+        logging.debug(f"Calling model inference on: {string}")
         out = drsamantha_infer(string)
+        logging.debug(f"Model output: {out}")
         await response_q.put(out)
 
 
@@ -84,9 +94,11 @@ async def startup_event() -> None:
     assert len(tf.config.list_physical_devices('GPU')) > 0
 
     # Initialize LLM
+    logging.info("Initializing Dr_Samantha model")
     drsamantha_init()
 
     # Initialize server model queue
+    logging.info("Initializing server queue")
     q = asyncio.Queue()
     app.model_queue = q
     asyncio.create_task(server_loop(q))
