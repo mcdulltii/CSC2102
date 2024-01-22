@@ -60,7 +60,7 @@ SIT CSC2101 (Professional Software Development and Team Project 2)
 ## Additional debugging
 1. For debugging purposes on the model, either use ```docker logs llm``` (or container name), or ```docker-compose logs llm``` (or container name)
 
-2. ```docker run --name llm -it -p 8080:8080 -v /path/to/mount/point:/server/data --runtime=nvidia --gpus all *image_name* bash``` to run the container as a standalone for further debugging in the bash shell
+2. ```docker run --name llm -it -p 8080:8080 -v /path/to/mount/point:/server/data --gpus all *image_name* bash``` to run the container as a standalone for further debugging in the bash shell
 
 ## Process termination debugging
 1. Monitor the processes using task manager, ```top``` or ```htop```  to see whether there is enough RAM for the model to be loaded into memory
