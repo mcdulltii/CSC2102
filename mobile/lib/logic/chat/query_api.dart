@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
-// Move to /services (maybe?)
 class QueryService {
   final String baseurl = "http://animaserver.duckdns.org:8080";
   final String username;
