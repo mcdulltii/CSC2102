@@ -6,11 +6,11 @@ class QueryService {
   final String baseurl = "http://animaserver.duckdns.org:8080";
   final String username;
   final String password;
-  final String prompt;
+  // final String prompt;
 
-  QueryService(this.username, this.password, {required this.prompt});
+  QueryService({required this.username, required this.password});
 
-  Future<String> queryPrompt() async {
+  Future<String> queryPrompt(String prompt) async {
     final http.Response response;
     try {
       response = await http.post(
@@ -28,4 +28,14 @@ class QueryService {
     String returnPrompt = jsonDecode(response.body);
     return returnPrompt;
   }
+}
+
+// Sample usage
+void prompt() async {
+  String prompt = "What is diabetes?"; // Switch w user_input
+  QueryService prompter = QueryService(
+      username: "Alice",
+      password: "Bob"); // Switch w username and password for credentials
+  String botResponse = await prompter.queryPrompt(prompt);
+  print(botResponse);
 }
