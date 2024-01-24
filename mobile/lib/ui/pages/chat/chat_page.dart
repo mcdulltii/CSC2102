@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
+import 'package:mobile/data/repos/query_repo.dart';
+import 'package:mobile/logic/cubit/chat_cubit.dart';
 import 'package:mobile/ui/pages/chat/components/bot_reply.dart';
+import 'package:mobile/ui/theme/theme.dart';
 
 import 'components/user_query.dart';
 
@@ -63,55 +68,93 @@ class _ChatPageState extends State<ChatPage> {
   ];
 
   final TextEditingController _textEditingController = TextEditingController();
+  bool isLoading = false;
+
+  late ChatCubit _chatCubit;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _chatCubit = BlocProvider.of<ChatCubit>(context);
+    super.initState();
+  }
+
+  void sentPrompt(String value) async {
+    await _chatCubit.getPrompt(value);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
+    return BlocBuilder<ChatCubit, ChatState>(
+      builder: (context, state) {
+        if (state is QueryLoaded) {
+          final message = Message(
+            date: DateTime.now(),
+            widget: BotReply(text: state.response),
+          );
+
+          messages.add(message);
+          isLoading = false;
+        } else {
+          isLoading = true;
         }
-      },
-      child: Scaffold(
-          appBar: AppBar(
-            title: const Text(
-              "Dr Bot",
-              style: TextStyle(fontWeight: FontWeight.bold),
+
+        return Scaffold(
+            appBar: AppBar(
+              title: const Text(
+                "Dr Bot",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          body: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            child: Column(
-              children: [
-                Expanded(
-                  child: GroupedListView<Message, DateTime>(
-                    reverse: true,
-                    order: GroupedListOrder.DESC,
-                    useStickyGroupSeparators: true,
-                    floatingHeader: true,
-                    elements: messages,
-                    groupBy: (message) => DateTime(message.date.year,
-                        message.date.month, message.date.day),
-                    groupHeaderBuilder: (Message message) => SizedBox(
-                      height: 40,
-                      child: Center(
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child:
-                                Text(DateFormat.yMMMd().format(message.date)),
+            drawer: const CustomNavigationDrawer(),
+            body: GestureDetector(
+              onTap: () {
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus) {
+                  currentFocus.unfocus();
+                }
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: GroupedListView<Message, DateTime>(
+                        reverse: true,
+                        order: GroupedListOrder.DESC,
+                        useStickyGroupSeparators: true,
+                        floatingHeader: true,
+                        elements: messages,
+                        groupBy: (message) => DateTime(message.date.year,
+                            message.date.month, message.date.day),
+                        groupHeaderBuilder: (Message message) => SizedBox(
+                          height: 40,
+                          child: Center(
+                            child: Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: Text(
+                                    DateFormat.yMMMd().format(message.date)),
+                              ),
+                            ),
                           ),
                         ),
+                        itemBuilder: (context, Message message) =>
+                            message.widget,
                       ),
                     ),
-                    itemBuilder: (context, Message message) => message.widget,
-                  ),
+                    isLoading
+                        ? const SpinKitThreeBounce(
+                            color: Colors.green,
+                            size: 20.0,
+                          )
+                        : const SizedBox(),
+                    TextBar()
+                  ],
                 ),
-                TextBar()
-              ],
-            ),
-          )),
+              ),
+            ));
+      },
     );
   }
 
@@ -153,16 +196,47 @@ class _ChatPageState extends State<ChatPage> {
                 date: DateTime.now(),
                 widget: UserQuery(text: _textEditingController.text),
               );
+
+              // call query function here
+              sentPrompt(_textEditingController.text);
+
               setState(() {
                 messages.add(message);
               });
               _textEditingController.clear();
-
-              //
             },
           ),
         ],
       ),
     );
   }
+}
+
+class CustomNavigationDrawer extends StatelessWidget {
+  const CustomNavigationDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [buildHeader(context), buildMenuItems(context)],
+        ),
+      ),
+    );
+  }
+
+  Widget buildHeader(BuildContext context) => Container(
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).padding.top,
+        ),
+      );
+
+  Widget buildMenuItems(BuildContext context) => const Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [TextField()],
+      );
 }

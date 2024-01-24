@@ -23,12 +23,7 @@ class _WrapperState extends State<Wrapper> {
     controller = PersistentTabController(initialIndex: 0);
 
     List<Widget> buildScreens() {
-      return [
-        const HomePage(),
-        const ChatPage(),
-        const HistoryPage(),
-        const ProfilePage()
-      ];
+      return [const HomePage(), const ChatPage(), const ProfilePage()];
     }
 
     List<PersistentBottomNavBarItem> navBarsItems() {
@@ -42,12 +37,6 @@ class _WrapperState extends State<Wrapper> {
         PersistentBottomNavBarItem(
           icon: const Icon(CupertinoIcons.chat_bubble_2_fill),
           title: ("Chat"),
-          activeColorPrimary: AppTheme.primaryColor,
-          inactiveColorPrimary: AppTheme.greyColor,
-        ),
-        PersistentBottomNavBarItem(
-          icon: const Icon(Icons.history),
-          title: ("History"),
           activeColorPrimary: AppTheme.primaryColor,
           inactiveColorPrimary: AppTheme.greyColor,
         ),

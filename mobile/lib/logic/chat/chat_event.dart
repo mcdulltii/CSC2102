@@ -6,3 +6,9 @@ sealed class ChatEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+class QuerySent extends ChatEvent {
+  final String queryText;
+
+  const QuerySent({required this.queryText});
+}
