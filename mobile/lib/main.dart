@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/data/repos/query_repo.dart';
-import 'package:mobile/logic/cubit/chat_cubit.dart';
+import 'package:mobile/ui/pages/home/home_page.dart';
 import 'package:mobile/ui/wrapper/wrapper.dart';
+
+import 'logic/chat/chat_cubit.dart';
 
 void main() {
   runApp(const MyApp());

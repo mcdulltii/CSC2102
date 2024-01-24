@@ -4,10 +4,12 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile/data/repos/query_repo.dart';
-import 'package:mobile/logic/cubit/chat_cubit.dart';
+
 import 'package:mobile/ui/pages/chat/components/bot_reply.dart';
 import 'package:mobile/ui/theme/theme.dart';
 
+import '../../../logic/chat/chat_cubit.dart';
+import 'components/drawer.dart';
 import 'components/user_query.dart';
 
 class Message {
@@ -210,33 +212,4 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
-}
-
-class CustomNavigationDrawer extends StatelessWidget {
-  const CustomNavigationDrawer({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [buildHeader(context), buildMenuItems(context)],
-        ),
-      ),
-    );
-  }
-
-  Widget buildHeader(BuildContext context) => Container(
-        padding: EdgeInsets.only(
-          top: MediaQuery.of(context).padding.top,
-        ),
-      );
-
-  Widget buildMenuItems(BuildContext context) => const Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [TextField()],
-      );
 }

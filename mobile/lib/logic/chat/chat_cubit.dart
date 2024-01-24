@@ -7,6 +7,7 @@ part 'chat_state.dart';
 class ChatCubit extends Cubit<ChatState> {
   final ChatQueryRepository _repo;
 
+
   ChatCubit(this._repo) : super(ChatInitial());
 
   Future<void> getPrompt(String value) async {
