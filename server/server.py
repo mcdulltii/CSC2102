@@ -3,10 +3,12 @@ from flask_cors import CORS, cross_origin
 from pymongo import MongoClient
 from bson import json_util
 from bson.objectid import ObjectId
+import mariadb
 import json
 
 # Define the MongoDB connection string
 MONGO_URI = "mongodb://root:password@mongodb:27017/mongo_db?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&retryWrites=true&ssl=false"
+
 
 # Create the Flask app
 app = Flask(__name__)
@@ -29,10 +31,28 @@ def connect_db() -> MongoClient:
     return client
 
 
-def close_db(client: MongoClient) -> None:
+def close_db(client: MongoClient, conn) -> None:
     if client:
         # Close the connection when done
         client.close()
+    if conn:
+        conn.close()
+
+
+def connect_db_mariadb():
+    try:
+        conn = mariadb.connect(
+            user="root",
+            password="password",
+            host="mariadb",
+            port=3306,
+            database="mysql_db"
+        )
+        print("Test")
+        return conn
+    except mariadb.error as e:
+        print(f"error connecting to mariadb platform: {e}")
+        return None
 
 
 @app.route("/api/addNewChat", methods=["POST"])
@@ -62,17 +82,18 @@ def get_all_chats():
 
 
 def main() -> None:
-    global db
+    global db, db_mariadb
     # Connect to the MongoDB database
     client = connect_db()
     # Get the database
     db = client.get_database()
+    db_mariadb = connect_db_mariadb()
     while True:
         try:
             app.run(host="0.0.0.0", port=8000, debug=True)
         except KeyboardInterrupt:
             break
-    close_db(client)
+    close_db(client, db_mariadb)
 
 
 if __name__ == '__main__':

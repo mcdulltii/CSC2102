@@ -36,7 +36,7 @@ services:
       PMA_PORT: 3306
       PMA_ARBITRARY: 1
     ports:
-      - 127.0.0.1:8080:80
+      - 127.0.0.1:8082:80
     depends_on:
       - mariadb
     networks:
@@ -71,23 +71,23 @@ services:
     networks:
       - app_network
 
-  llm:
-    build: llm
-    container_name: llm
-    restart: always
-    ports:
-      - 8080:8080
-    volumes:
-      - ./uvicorn_data:/server/data
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    networks:
-      - app_network
+  # llm:
+  #   build: llm
+  #   container_name: llm
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
+  #   volumes:
+  #     - ./uvicorn_data:/server/data
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+  #   networks:
+  #     - app_network
 
 networks:
   app_network:
