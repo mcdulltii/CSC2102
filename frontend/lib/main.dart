@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile/data/repository/query_repo.dart';
+import 'package:mobile/ui/pages/history/history_page.dart';
 import 'package:mobile/ui/wrapper/wrapper.dart';
 
 import 'logic/chat/chat_cubit.dart';
