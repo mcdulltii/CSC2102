@@ -4,10 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:mobile/utils/constants.dart';
 
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:http/http.dart' as http;
 
 class ChatQueryRepository {
   final String baseurl = QUERY_BASE_URL;

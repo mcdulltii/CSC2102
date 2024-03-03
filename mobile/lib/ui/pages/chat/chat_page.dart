@@ -3,10 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
-import 'package:mobile/data/repos/query_repo.dart';
 
 import 'package:mobile/ui/pages/chat/components/bot_reply.dart';
-import 'package:mobile/ui/theme/theme.dart';
 
 import '../../../logic/chat/chat_cubit.dart';
 import 'components/drawer.dart';

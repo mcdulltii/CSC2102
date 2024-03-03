@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:mobile/data/repos/query_repo.dart';
+import 'package:mobile/data/repository/query_repo.dart';
 
 part 'chat_state.dart';
 
