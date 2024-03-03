@@ -1,26 +1,37 @@
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import 'package:mobile/data/repository/query_repo.dart';
+import 'package:flutter/material.dart';
+import 'package:frontend/data/model/message.dart';
+import 'package:frontend/data/repository/chat/chat_repo.dart';
 
 part 'chat_state.dart';
 
 class ChatCubit extends Cubit<ChatState> {
-  final ChatQueryRepository _repo;
+  final ChatRepo repo;
 
+  List<Message> messages = [];
 
-  ChatCubit(this._repo) : super(ChatInitial());
+  ChatCubit(this.repo) : super(ChatInitial());
 
-  Future<void> getPrompt(String value) async {
-    emit(QueryLoading());
+  Future<void> sendQuery(String text) async {
+    final userMessage =
+        Message(isBot: true, timestamp: DateTime.now(), payload: text);
 
+    messages.add(userMessage);
+    emit(ChatQueryLoading());
     try {
-      final response = await _repo.queryPrompt(value);
+      final result = await repo.queryPrompt(text);
 
-      emit(QueryLoaded(response: response));
+      final botMessage = Message(
+        isBot: false,
+        timestamp: DateTime.now(),
+        payload: result,
+      );
+
+      messages.add(botMessage);
+
+      emit(ChatQueryLoaded());
     } catch (e) {
-      emit(QueryErrorState(
-        errorMessage: e.toString(),
-      ));
+      emit(QueryResultError(message: e.toString()));
     }
   }
 }

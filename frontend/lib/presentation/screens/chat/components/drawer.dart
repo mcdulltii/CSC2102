@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/data/model/chat.dart';
+import 'package:frontend/data/model/chat.dart';
 
 class CustomNavigationDrawer extends StatefulWidget {
   const CustomNavigationDrawer({super.key});
@@ -11,15 +11,15 @@ class CustomNavigationDrawer extends StatefulWidget {
 class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
   List<Chat> chatHistory = [
     Chat(
-        id: '1', title: 'Medical Needs Appointment', createdAt: DateTime.now()),
+        id: '1', title: 'Medical Needs Appointment', timestamp: DateTime.now()),
     Chat(
         id: '2',
         title: 'Medical Needs Query String',
-        createdAt: (DateTime.now()).subtract(const Duration(days: 7))),
+        timestamp: (DateTime.now()).subtract(const Duration(days: 7))),
     Chat(
         id: '3',
         title: 'Medical Needs Help Is Me',
-        createdAt: (DateTime.now()).subtract(const Duration(days: 30)))
+        timestamp: (DateTime.now()).subtract(const Duration(days: 30)))
   ];
 
   late Map<String, List<Chat>> formatChat;
@@ -115,7 +115,7 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
     DateTime now = DateTime.now();
 
     for (Chat chat in chatHistory) {
-      int daysDifference = now.difference(chat.createdAt).inDays;
+      int daysDifference = now.difference(chat.timestamp).inDays;
 
       if (daysDifference <= 7) {
         segments['7 Days']?.add(chat);

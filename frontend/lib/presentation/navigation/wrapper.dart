@@ -1,12 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile/ui/pages/chat/chat_page.dart';
-import 'package:mobile/ui/pages/history/history_page.dart';
-import 'package:mobile/ui/pages/home/home_page.dart';
-import 'package:mobile/ui/pages/profile/profile.dart';
+import 'package:frontend/presentation/screens/chat/pages/chat_page.dart';
+import 'package:frontend/presentation/screens/home/pages/home_page.dart';
+import 'package:frontend/presentation/theme/theme.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
-
-import '../theme/theme.dart';
 
 class Wrapper extends StatefulWidget {
   const Wrapper({super.key});
@@ -23,7 +20,7 @@ class _WrapperState extends State<Wrapper> {
     controller = PersistentTabController(initialIndex: 0);
 
     List<Widget> buildScreens() {
-      return [const HomePage(), const ChatPage(), const ProfilePage()];
+      return [const HomePage(), const ChatPage()];
     }
 
     List<PersistentBottomNavBarItem> navBarsItems() {
@@ -37,12 +34,6 @@ class _WrapperState extends State<Wrapper> {
         PersistentBottomNavBarItem(
           icon: const Icon(CupertinoIcons.chat_bubble_2_fill),
           title: ("Chat"),
-          activeColorPrimary: AppTheme.primaryColor,
-          inactiveColorPrimary: AppTheme.greyColor,
-        ),
-        PersistentBottomNavBarItem(
-          icon: const Icon(CupertinoIcons.square_stack_3d_down_right_fill),
-          title: ("Profile"),
           activeColorPrimary: AppTheme.primaryColor,
           inactiveColorPrimary: AppTheme.greyColor,
         ),

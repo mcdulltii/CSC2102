@@ -1,14 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:frontend/utils/constants.dart';
 import 'package:http/http.dart' as http;
-import 'package:mobile/utils/constants.dart';
-
 import 'dart:async';
 
-class ChatQueryRepository {
+class ChatRepo {
   final String baseurl = QUERY_BASE_URL;
 
-  ChatQueryRepository();
+  ChatRepo();
 
   Future<String> queryPrompt(String prompt) async {
     try {
