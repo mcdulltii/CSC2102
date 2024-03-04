@@ -73,23 +73,23 @@ services:
     networks:
       - app_network
 
-  # llm:
-  #   build: llm
-  #   container_name: llm
-  #   restart: always
-  #   ports:
-  #     - 8080:8080
-  #   volumes:
-  #     - ./uvicorn_data:/server/data
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #           - driver: nvidia
-  #             count: 1
-  #             capabilities: [gpu]
-  #   networks:
-  #     - app_network
+  llm:
+    build: llm
+    container_name: llm
+    restart: always
+    ports:
+      - 8080:8080
+    volumes:
+      - ./uvicorn_data:/server/data
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - app_network
 
 networks:
   app_network:
