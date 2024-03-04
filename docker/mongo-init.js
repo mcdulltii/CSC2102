@@ -11,4 +11,7 @@ db.createUser(
     }
 );
 
-db.chats.createIndex( { chatId: -1 } );
+db.chats.createIndex({ _id: -1 });
+db.messages.createIndex({ _id: -1 });
+
+
