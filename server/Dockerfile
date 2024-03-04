@@ -1,4 +1,4 @@
-FROM pypy:slim
+FROM python:3.10
 
 ADD https://github.com/vishnubob/wait-for-it/raw/master/wait-for-it.sh /wait-for-it.sh
 RUN chmod +x /wait-for-it.sh

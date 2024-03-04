@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
-from pymongo import MongoClient
+from pymongo import MongoClient, errors
 from bson import json_util
 from bson.objectid import ObjectId
 import mariadb
@@ -31,54 +31,91 @@ def connect_db() -> MongoClient:
     return client
 
 
-def close_db(client: MongoClient, conn) -> None:
+def close_db(client: MongoClient) -> None:
     if client:
         # Close the connection when done
         client.close()
-    if conn:
-        conn.close()
-
 
 def connect_db_mariadb():
     try:
         conn = mariadb.connect(
-            user="root",
+            user="user",
             password="password",
             host="mariadb",
             port=3306,
             database="mysql_db"
         )
-        print("Test")
+        print("Connected to MariaDB successfully")
         return conn
     except mariadb.error as e:
-        print(f"error connecting to mariadb platform: {e}")
+        print(f"Error connecting to mariadb platform: {e}")
         return None
+
+@app.route("/api/addNewUser", methods=["POST"])
+@cross_origin()
+def add_new_user():
+    global db_mariadb
+    user_data = request.get_json()
+    
+    with db_mariadb.cursor() as cursor:
+        try:
+            cursor.execute("INSERT INTO users (user_id, user_name, user_password_hash) VALUES (%s, %s, %s)",
+                        (user_data["userId"], user_data["userName"], user_data["userPasswordHash"]))
+            db_mariadb.commit()
+            return {"result": True, "message": "User added successfully!"}, 201
+        except Exception as e:
+            print(e)
+            if "cursor" in locals():
+                db_mariadb.rollback()
+            return {"result": False, "error": "Failed to add user"}, 500
+        finally:
+            cursor.close()
 
 
 @app.route("/api/addNewChat", methods=["POST"])
 @cross_origin()
 def add_new_chat():
-    global db
+    global db, db_mariadb
     chat_data = request.get_json()
     chats_collection = db.chats
 
-    # Add the new chat to the collection
-    new_chat = {"chatId": chat_data["chatId"]}
-    chats_collection.insert_one(new_chat)
+    with db_mariadb.cursor() as cursor:
+        try:
+            cursor.execute("INSERT INTO chats (chat_id, user_id) VALUES (%s, %s)", (chat_data["chatId"], chat_data["userId"]))
+            db_mariadb.commit()
 
-    return {"result": True, "message": "Chat added successfully!"}, 201
+            new_chat = {"chatId": chat_data["chatId"]}
+            chats_collection.insert_one(new_chat)
 
+            return {"result": True, "message": "Chat added successfully!"}, 201
+        except Exception as e:
+            print(e)
+            if "cursor" in locals():
+                db_mariadb.rollback()
+            return {"result": False, "error": "Failed to add chat"}, 500
+        finally:
+            cursor.close()
 
+    
 @app.route("/api/getAllChats")
 @cross_origin()
 def get_all_chats():
-    global db
+    global db, db_mariadb
+
+    # Requires user id in query parameters
+    user_id = request.args.get("user_id")
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
+    
+    cursor = db_mariadb.cursor()
+    cursor.execute("SELECT chat_id FROM chats WHERE user_id = %s", (user_id,))
+    chat_ids = [row["chat_id"] for row in cursor.fetchall()]
+    cursor.close()  
+
     chats_collection = db.chats
+    all_chats = [json.loads(json_util.dumps(chat)) for chat in chats_collection.find({"chatId": {"$in": chat_ids}})]
 
-    # Get all chats from the collection
-    all_chats = [json.loads(json_util.dumps(chat)) for chat in chats_collection.find()]
-
-    return all_chats, 200
+    return jsonify(all_chats), 200
 
 
 def main() -> None:
@@ -93,7 +130,7 @@ def main() -> None:
             app.run(host="0.0.0.0", port=8000, debug=True)
         except KeyboardInterrupt:
             break
-    close_db(client, db_mariadb)
+    close_db(client)
 
 
 if __name__ == '__main__':
