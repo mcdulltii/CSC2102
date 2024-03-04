@@ -52,6 +52,24 @@ def connect_db_mariadb():
             database="mysql_db"
         )
         print("Connected to MariaDB successfully")
+
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute("""CREATE TABLE IF NOT EXISTS `users` (
+                    `user_id` CHAR(36) NOT NULL,
+                    `user_email` VARCHAR(255) NOT NULL,
+                    `user_password_hashed` VARCHAR(255) NOT NULL,
+                    PRIMARY KEY (`user_id`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;""")
+                conn.commit()
+                print("Tables created successfully!")
+            except Exception as e:
+                print(e)
+                if "cursor" in locals():
+                    conn.rollback()
+            finally:
+                cursor.close()
+
         return conn
     except mariadb.error as e:
         print(f"Error connecting to mariadb platform: {e}")
