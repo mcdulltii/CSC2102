@@ -12,13 +12,13 @@ import json
 # Define the MongoDB connection string
 MONGO_URI = "mongodb://root:password@mongodb:27017/mongo_db?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&retryWrites=true&ssl=false"
 
-
 # Create the Flask app
 app = Flask(__name__)
 cors = CORS(app)
 bcrypt = Bcrypt(app)
 app.config["CORS_HEADERS"] = "Content-Type"
 db = None
+db_mariadb = None
 
 
 def connect_db() -> MongoClient:
@@ -31,7 +31,7 @@ def connect_db() -> MongoClient:
         print("Could not connect to MongoDB:", e)
     except Exception as e:
         print("An error occurred:", e)
-    
+
     return client
 
 
@@ -58,13 +58,31 @@ def connect_db_mariadb():
         return None
 
 
+def close_db_mariadb(conn) -> None:
+    if conn:
+        # Close the connection when done
+        conn.close()
+
+
+# Validate email format
+def validate_email(email):
+    pattern = re.compile(r'^\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b')
+    return bool(pattern.match(email))
+
+
+# Validate password
+def is_valid_password(password):
+    # Can add more password requirements here
+    return len(password) >= 8
+
+
 @app.route("/api/addNewUser", methods=["POST"])
 @cross_origin()
 def add_new_user():
     global db_mariadb
-    # User data to include user email and password 
+    # User data to include user email and password
     user_data = request.get_json()
-    
+
     if "userEmail" not in user_data or "userPassword" not in user_data or not validate_email(user_data["userEmail"]) or not is_valid_password(user_data["userPassword"]):
         return {"result": False, "error": "Invalid or missing email/password"}, 400
 
@@ -73,7 +91,7 @@ def add_new_user():
 
     # Generate a UUID for user ID
     userId = str(uuid.uuid4())
-    
+
     with db_mariadb.cursor() as cursor:
         try:
             cursor.execute("INSERT INTO users (user_id, user_email, user_password_hashed) VALUES (%s, %s, %s)",
@@ -88,15 +106,6 @@ def add_new_user():
         finally:
             cursor.close()
 
-# Validate email format
-def validate_email(email):
-    pattern = re.compile(r'^\S+@\S+\.\S+$')
-    return bool(pattern.match(email))
-
-# Validate password
-def is_valid_password(password):
-    #  can add more password requirements here
-    return len(password) >= 8
 
 @app.route("/api/login", methods=["POST"])
 @cross_origin()
@@ -107,12 +116,12 @@ def login():
 
     if "userEmail" not in login_data or "userPassword" not in login_data:
         return {"result": False, "error": "User email and password are required"}, 400
-    
+
     with db_mariadb.cursor(dictionary=True) as cursor:
-        try: 
+        try:
             cursor.execute("SELECT user_id, user_email, user_password_hashed FROM users WHERE user_email = %s", (login_data["userEmail"],))
             user = cursor.fetchone()
-            
+
             if user and bcrypt.check_password_hash(user["user_password_hashed"], login_data["userPassword"]):
                 return {"result": True, "message": "Login successful", "user_id": user["user_id"]}, 200
             else:
@@ -134,7 +143,7 @@ def add_new_chat():
 
     if "userId" not in chat_data or "title" not in chat_data or "timestamp" not in chat_data:
         return {"result": False, "error": "User ID, title and timestamp are required"}, 400
-    
+
     chats_collection = db.chats
 
     new_chat = {
@@ -150,12 +159,12 @@ def add_new_chat():
         print(e)
         return {"result": False, "error": "Failed to create chat"}, 500
 
-    
+
 @app.route("/api/getAllChats")
 @cross_origin()
 def get_all_chats():
     global db
-    # Requires user ID 
+    # Requires user ID
     user_id = request.args.get("userId")
 
     if not user_id:
@@ -186,7 +195,7 @@ def update_chat_title():
 
     if "chatId" not in update_data or "title" not in update_data:
         return {"result": False, "error": "Chat ID and title are required"}, 400
-    
+
     chats_collection = db.chats
 
     try:
@@ -209,14 +218,14 @@ def create_message():
 
     if "chatId" not in message_data or "isBot" not in message_data or "payload" not in message_data or "timestamp" not in message_data:
         return {"result": False, "error": "Chat ID, isBot, payload and timestamps are required"}, 400
-    
+
     chats_collection = db.chats
     messages_collection = db.messages
 
     # Check if the chat exists
     if not chats_collection.find_one({"_id": ObjectId(message_data["chatId"])}):
         return {"result": False, "error": "Chat not found"}, 404
-    
+
     new_message = {
         "chatId": message_data["chatId"],
         "isBot": message_data["isBot"],
@@ -224,7 +233,7 @@ def create_message():
         "timestamp": message_data["timestamp"]
     }
 
-    try: 
+    try:
         result = messages_collection.insert_one(new_message)
         return {"result": True, "message": "Message created successfully", "message_id": str(result.inserted_id)}, 201
     except Exception as e:
@@ -236,12 +245,12 @@ def create_message():
 @cross_origin()
 def get_message():
     global db
-    # Requires chat ID 
+    # Requires chat ID
     chat_id = request.args.get("chatId")
 
     if not chat_id:
         return {"result": False, "error": "Chat ID is required"}, 400
-    
+
     messages_collection = db.messages
     messages = messages_collection.find({"chatId": chat_id})
 
@@ -271,6 +280,7 @@ def main() -> None:
         except KeyboardInterrupt:
             break
     close_db(client)
+    close_db_mariadb(db_mariadb)
 
 
 if __name__ == '__main__':
