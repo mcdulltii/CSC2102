@@ -4,10 +4,11 @@ from flask_bcrypt import Bcrypt
 from pymongo import MongoClient, errors
 from bson import json_util
 from bson.objectid import ObjectId
+import mysql.connector
 import re
 import uuid
-import mariadb
 import json
+import sys
 
 # Define the MongoDB connection string
 MONGO_URI = "mongodb://root:password@mongodb:27017/mongo_db?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&retryWrites=true&ssl=false"
@@ -31,6 +32,7 @@ def connect_db() -> MongoClient:
         print("Could not connect to MongoDB:", e)
     except Exception as e:
         print("An error occurred:", e)
+        sys.exit()
 
     return client
 
@@ -44,18 +46,36 @@ def close_db(client: MongoClient) -> None:
 def connect_db_mariadb():
     try:
         # Connect to Mariadb
-        conn = mariadb.connect(
-            user="user",
-            password="password",
+        conn = mysql.connector.connect(
+            user="root",
+            password="secret",
             host="mariadb",
-            port=3306,
             database="mysql_db"
         )
         print("Connected to MariaDB successfully")
+
+        with conn.cursor() as cursor:
+            try:
+                cursor.execute("""CREATE TABLE IF NOT EXISTS `users` (
+                    `user_id` CHAR(36) NOT NULL,
+                    `user_email` VARCHAR(255) NOT NULL,
+                    `user_password_hashed` VARCHAR(255) NOT NULL,
+                    PRIMARY KEY (`user_id`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;""")
+                conn.commit()
+                print("Tables created successfully!")
+            except Exception as e:
+                print(e)
+                if "cursor" in locals():
+                    conn.rollback()
+                sys.exit()
+            finally:
+                cursor.close()
+
         return conn
-    except mariadb.error as e:
+    except mysql.connector.Error as e:
         print(f"Error connecting to mariadb platform: {e}")
-        return None
+        sys.exit()
 
 
 def close_db_mariadb(conn) -> None:
