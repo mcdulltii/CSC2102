@@ -4,16 +4,43 @@ metadata:
   name: mongodb
   namespace: psd2
   labels:
-    name: mongo
+    app: mongodb
 spec:
   ports:
   - port: 27017
     targetPort: 27017
   clusterIP: None
   selector:
-    role: mongo
+    app: mongodb
 ---
-apiVersion: apps/v1beta1
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongosecret
+  namespace: psd2
+type: Opaque
+data:
+  mongosecret: |-
+    RmRWWVoxWUFzcUZEcFQvazJQWHZFK25nMXpUTGgvL1QzaUZMS2UyMWVkdlhkWGZxTysvYjlTVFNL
+    cnA3Vk5ZUgpsUjE3UUovZHR0NTRvRWIwSFhTTU9FeTdTVklhWXo2Zk82SElURmx4MlU3aHliWDJp
+    M1M4YmN1ZTQ1SEFFQ240ClJvMG5nQTlaamVWQ1pxYW1FZnVDUFVEMk9OaGRjOTJ5R2RoVjlMYndl
+    WWQvd2ZhTWJ6ZXhwUnU3L0pSdzI2UlIKSVJXU0VWci9QQjJyWFRhTlJuOEU3cDZkOXFxWWJ4UkxZ
+    dWVjUml3V29EQ2lLSkl0Y0xkNGNydURnTTR5V1Y4VgptcFp1M1p6VDF1T0ZuanBMdEpaVjQzOWVB
+    NlRiUG9XR0NVZTVhaDYzaGxVaCsyUDNlYjZxOW1PQlpjb2NVYjBICmtHMWZXZ3pkaWl3c2p0MjJK
+    WE5uaFNYUjhQN21OYTlSM1JQRDhKMS9uVHhLN1JnWmJrU1E4WTBtQ05HcEIrRHEKSUdLaW9JbURo
+    c3pjeXhNVmFpaFFhNnhFbkU3Z3dyZ2ZJT0phY0dURFhJMnB0WWNMMmZldmMwamFZNU9qZTR2dQpZ
+    QkpVbm1MNjVYVHBrRksweHlQU21OZDR1cGljQlU4UVppVytIL0NuU1pxSFJycStFVENsY2xHTVQw
+    Y1J1OVl3CjhJNm1BdG1sU0VmbkdyZzFSZEZkSjhJK1BZOWl2OHJOOW50cVBsSXphSTFRbUhjL0xY
+    VlZYODZUQTBiS2pINE0KWXBUb3BiK2RNS2UwdjQreVU5dWxZZ1BVTXZBMVBybzNJRW9kQVY3Yy9D
+    L01hWlo0MEdMVFUxUkJBWVNTWGZoMwo0MkRkRXM5bStqWFNUblRmamsyZTZuTFVEM2trTkRaMU5y
+    b3FKZXMyaGlkNmE3SnJUUk9kSnpaZU85aXgwT2tZClNScVYzWFBnN3BuWkdPUURWMkw2MTNvYTVu
+    M1FXbUN3NVh2R1VoUmM0V2xIUVRUV3liNXNUeUoyaWNKL2VkTVYKTEV5a2QwUUtuaXlOZmVHR0pj
+    VEt0UTNUQS9VeUo3d1JOcTdhaFVXa0RHakxtK3Y2RzdwaEw4dFpGQ01KeVhOVQo1ZGswWmxyU1Nq
+    RW9yWFNqMllKekhySFJ0MzZpc29kV0xtN05mREdnU0FMdzFwL0U4RDgxNmU1bmFneUxKdnRDCldX
+    bTFGZGJCRHZqaEtXMFg2SVZCMTU5WlUydFdNZDRCS09BYWViYzZIODUwcEpEbEZKQVp4a09lWS8w
+    U1FUOXQKd3JUM2kwVktORDRLdHlkMzNhcGRTby93ZHlSVwo=
+---
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mongod
@@ -21,11 +48,14 @@ metadata:
 spec:
   serviceName: mongodb
   replicas: 3
+  selector:
+    matchLabels:
+      app: mongodb
   template:
     metadata:
       namespace: psd2
       labels:
-        role: mongo
+        app: mongodb
         environment: test
         replicaset: MainRepSet
     spec:
@@ -83,9 +113,9 @@ spec:
                 do
                   # Need to check to make sure that the other pods are currently up
                   initiated=`mongo --quiet --eval 'rs.initiate({_id: "MainRepSet", version: 1, members: [
-                         { _id: 0, host : "mongod-0.mongodb.default.svc.cluster.local:27017" },
-                         { _id: 1, host : "mongod-1.mongodb.default.svc.cluster.local:27017" },
-                         { _id: 2, host : "mongod-2.mongodb.default.svc.cluster.local:27017" }
+                         { _id: 0, host : "mongod-0.mongodb.psd2.svc.cluster.local:27017" },
+                         { _id: 1, host : "mongod-1.mongodb.psd2.svc.cluster.local:27017" },
+                         { _id: 2, host : "mongod-2.mongodb.psd2.svc.cluster.local:27017" }
                    ]})["ok"]'`;
                   replica_exists=`mongo --quiet --eval 'db.isMaster()["ismaster"]'`;
                    # Shit we need to check rs status i think instead
@@ -109,8 +139,7 @@ spec:
           volumeMounts:
             - name: secrets-volume
               # readOnly: true
-              mountPath: /etc/secrets-volume/mongosecret
-              subPath: docker/mongosecret
+              mountPath: /etc/secrets-volume
             - name: mongodb-persistent-storage-claim
               mountPath: /data/db
       volumes:
@@ -135,7 +164,7 @@ spec:
 ---
 # Local storage
 kind: StorageClass
-apiVersion: storage.k8s.io/v1beta1
+apiVersion: storage.k8s.io/v1
 metadata:
   name: fast
   namespace: psd2
