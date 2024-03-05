@@ -56,8 +56,6 @@ spec:
       namespace: psd2
       labels:
         app: mongodb
-        environment: test
-        replicaset: MainRepSet
     spec:
       affinity:
         # This is to prevent mongodb replicas from ending up on the same
@@ -76,7 +74,6 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: mongod-container
-          #image: pkdone/mongo-ent:3.4
           image: mongo
           imagePullPolicy: Always
           env:
@@ -112,24 +109,24 @@ spec:
                 while [ "$replica_exists" != true ]
                 do
                   # Need to check to make sure that the other pods are currently up
-                  initiated=`mongo --quiet --eval 'rs.initiate({_id: "MainRepSet", version: 1, members: [
+                  initiated=`mongosh --quiet --eval 'rs.initiate({_id: "MainRepSet", version: 1, members: [
                          { _id: 0, host : "mongod-0.mongodb.psd2.svc.cluster.local:27017" },
                          { _id: 1, host : "mongod-1.mongodb.psd2.svc.cluster.local:27017" },
                          { _id: 2, host : "mongod-2.mongodb.psd2.svc.cluster.local:27017" }
                    ]})["ok"]'`;
-                  replica_exists=`mongo --quiet --eval 'db.isMaster()["ismaster"]'`;
+                  replica_exists=`mongosh --quiet --eval 'db.isMaster()["ismaster"]'`;
                    # Shit we need to check rs status i think instead
                   echo "Replica exists: " $replica_exists;
                   sleep 2
                 done
                 # If everything else is workign then we need to create an admin user
-                mongo --eval "db.getSiblingDB('admin').createUser({
+                mongosh --eval "db.getSiblingDB('admin').createUser({
                       user : \"$MONGO_USER\",
                       pwd  : \"$MONGO_PASSWORD\",
                       roles: [ { role: 'root', db: 'admin' } ]
                 });"
                 echo "STATEFULSET_NAME: $STATEFULSET_NAME \n MACHINE_MEMORY: $MACHINE_MEMORY";
-              fi && tailf /var/log/mongod.log
+              fi && tail -f /var/log/mongod.log
           # resources:
           #   requests:
           #     cpu: 1
