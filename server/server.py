@@ -73,7 +73,7 @@ def connect_db_mariadb():
                 cursor.close()
 
         return conn
-    except mariadb.Error as e:
+    except mysql.connector.Error as e:
         print(f"Error connecting to mariadb platform: {e}")
         sys.exit()
 
