@@ -51,11 +51,38 @@ SIT CSC2101 (Professional Software Development and Team Project 2)
 3. Check for successful installation by running ```sudo docker run --rm --gpus all ubuntu nvidia-smi```, if a table like [this](./images/nvidiasmi.png) does not show up as an echo from your docker container, perhaps you have missed a step somewhere in the installation process.
 
 ## Running the services
-1. cd CSC2102
 
-2. docker-compose up
+### Docker & Docker Compose
+1. `cd CSC2102`
+
+2. `docker-compose up -d`
 
 3. Wait for the server to download the shard required for loading the model into your GPU.
+
+4. `docker-compose down`
+
+### Kubernetes
+1. `cd CSC2102`
+
+2. `docker-compose -f docker-compose-llm.yml up -d`
+
+3. Create K8s namespace
+
+    `kubectl apply -f ./namespace-yaml`
+
+4. Start K8s replicasets and statefulsets
+
+    `kubectl apply -f ./mariadb.yaml`
+
+    `kubectl apply -f ./mongodb.yaml`
+
+    `kubectl apply -f ./server.yaml`
+
+5. Stop cluster
+
+    `kubectl delete -f .`
+
+    `docker-compose -f docker-compose-llm.yml down`
 
 ## Additional debugging
 1. For debugging purposes on the model, either use ```docker logs llm``` (or container name), or ```docker-compose logs llm``` (or container name)
