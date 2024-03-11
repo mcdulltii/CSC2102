@@ -10,6 +10,8 @@ class ChatCubit extends Cubit<ChatState> {
 
   List<Message> messages = [];
 
+  bool isError = false;
+
   ChatCubit(this.repo) : super(ChatInitial());
 
   Future<void> sendQuery(String text) async {
@@ -20,6 +22,8 @@ class ChatCubit extends Cubit<ChatState> {
     emit(ChatQueryLoading());
     try {
       final result = await repo.queryPrompt(text);
+
+      _checkError(result);
 
       final botMessage = Message(
         isBot: false,
@@ -32,6 +36,16 @@ class ChatCubit extends Cubit<ChatState> {
       emit(ChatQueryLoaded());
     } catch (e) {
       emit(QueryResultError(message: e.toString()));
+    }
+  }
+
+  void _checkError(String result) {
+    if (result == "The request timed out. Please try again." ||
+        result ==
+            "I apologize, there was an error processing your query. Please try again.") {
+      isError = true;
+    } else {
+      isError = false;
     }
   }
 }

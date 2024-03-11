@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:frontend/data/model/message.dart';
 import 'package:frontend/logic/chat/chat_cubit.dart';
 import 'package:frontend/presentation/helpers/keyboard_dimiss.dart';
@@ -33,7 +34,18 @@ class _ChatPageState extends State<ChatPage> {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text("Dr. Bot"),
+            toolbarHeight: 80,
+            title: const Text(
+              "Dr. Bot",
+              style: TextStyle(fontSize: 26),
+            ),
+            actions: [
+              SizedBox(
+                height: 100,
+                width: 100,
+                child: Image.asset("assets/robot.gif"),
+              )
+            ],
           ),
           drawer: const CustomNavigationDrawer(),
           body: Column(
@@ -46,8 +58,8 @@ class _ChatPageState extends State<ChatPage> {
                   useStickyGroupSeparators: true,
                   floatingHeader: true,
                   elements: cubit.messages,
-                  groupBy: (message) => DateTime(
-                      message.timestamp.year, message.timestamp.month, message.timestamp.day),
+                  groupBy: (message) => DateTime(message.timestamp.year,
+                      message.timestamp.month, message.timestamp.day),
                   groupHeaderBuilder: (Message message) => SizedBox(
                     height: 40,
                     child: Center(
@@ -70,6 +82,14 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                 ),
+              ),
+              Center(
+                child: state is ChatQueryLoading
+                    ? const SpinKitThreeBounce(
+                        color: Colors.blue,
+                        size: 20.0,
+                      )
+                    : null,
               ),
               TypeBar(
                 editingController: editingController,

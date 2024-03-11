@@ -12,27 +12,31 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'DR. Bot',
-      theme: ThemeData(
-        useMaterial3: true,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) => ChatRepo(),
+        ),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => ChatCubit(
+              RepositoryProvider.of<ChatRepo>(context),
+            ),
+          ),
+        ],
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'DR. Bot',
+          theme: ThemeData(
+            useMaterial3: true,
+          ),
+          home: const Wrapper(),
+        ),
       ),
-      home: MultiRepositoryProvider(
-          providers: [
-            RepositoryProvider(
-              create: (context) => ChatRepo(),
-            ),
-          ],
-          child: MultiBlocProvider(providers: [
-            BlocProvider(
-              create: (context) =>
-                  ChatCubit(RepositoryProvider.of<ChatRepo>(context)),
-            ),
-          ], child: const Wrapper())),
     );
   }
 }

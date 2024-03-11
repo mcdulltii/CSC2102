@@ -7,9 +7,7 @@ final class ChatInitial extends ChatState {}
 
 final class ChatQueryLoading extends ChatState {}
 
-final class ChatQueryLoaded extends ChatState {
-  ChatQueryLoaded();
-}
+final class ChatQueryLoaded extends ChatState {}
 
 final class QueryResultError extends ChatState {
   final String message;
