@@ -1,0 +1,9 @@
+starlette>=0.35.1
+uvicorn>=0.26.0
+tensorflow>=2.15.0
+transformers>=4.36.2
+sentencepiece>=0.1.99
+accelerate>=0.26.1
+sacremoses>=0.1.1
+auto-gptq>=0.6.0
+optimum>=1.16.2
