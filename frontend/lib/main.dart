@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:frontend/data/repository/chat/chat_repo.dart';
+import 'package:frontend/data/repository/chat/message_repository.dart';
 import 'package:frontend/presentation/navigation/wrapper.dart';
 
-import 'logic/chat/chat_cubit.dart';
+import 'logic/message/message_cubit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,14 +17,14 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
-          create: (context) => ChatRepo(),
+          create: (context) => MessageRepository(),
         ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => ChatCubit(
-              RepositoryProvider.of<ChatRepo>(context),
+            create: (context) => MessageCubit(
+              RepositoryProvider.of<MessageRepository>(context),
             ),
           ),
         ],
