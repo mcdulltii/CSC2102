@@ -12,7 +12,7 @@ class TypeBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(15),
+      margin: const EdgeInsets.only(left: 15, right: 15, bottom: 30),
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       decoration: BoxDecoration(
         color: Colors.white,

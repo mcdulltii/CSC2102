@@ -34,22 +34,19 @@ class _ChatPageState extends State<ChatPage> {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            toolbarHeight: 80,
             title: const Text(
               "Dr. Bot",
               style: TextStyle(fontSize: 26),
             ),
-            actions: [
-              SizedBox(
-                height: 100,
-                width: 100,
-                child: Image.asset("assets/robot.gif"),
-              )
-            ],
           ),
           drawer: const CustomNavigationDrawer(),
           body: Column(
             children: [
+              SizedBox(
+                width: 300,
+                height: 300,
+                child: Image.asset("assets/robot.gif", fit: BoxFit.cover),
+              ),
               Expanded(
                 child: GroupedListView(
                   padding: const EdgeInsets.all(10),

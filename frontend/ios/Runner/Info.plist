@@ -47,7 +47,11 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<key>UIApplicationSupportsIndirectInputEvents</key> 
 	<true/>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Main</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Main</string>
 </dict>
 </plist>
