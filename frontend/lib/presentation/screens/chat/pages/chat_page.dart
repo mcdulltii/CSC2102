@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:frontend/data/model/message.dart';
-import 'package:frontend/logic/chat/chat_cubit.dart';
+import 'package:frontend/logic/message/message_cubit.dart';
 import 'package:frontend/presentation/helpers/keyboard_dimiss.dart';
 import 'package:frontend/presentation/screens/chat/components/drawer.dart';
 import 'package:frontend/presentation/screens/chat/components/text_bubble.dart';
@@ -18,19 +18,19 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  late ChatCubit cubit;
+  late MessageCubit cubit;
 
   TextEditingController editingController = TextEditingController();
 
   @override
   void initState() {
-    cubit = BlocProvider.of<ChatCubit>(context);
+    cubit = BlocProvider.of<MessageCubit>(context);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return KeyboardDismissOnTap(child: BlocBuilder<ChatCubit, ChatState>(
+    return KeyboardDismissOnTap(child: BlocBuilder<MessageCubit, MessageState>(
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
@@ -81,7 +81,7 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ),
               Center(
-                child: state is ChatQueryLoading
+                child: state is MessageQueryLoading
                     ? const SpinKitThreeBounce(
                         color: Colors.blue,
                         size: 20.0,

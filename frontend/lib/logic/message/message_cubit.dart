@@ -1,25 +1,25 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/data/model/message.dart';
-import 'package:frontend/data/repository/chat/chat_repo.dart';
+import 'package:frontend/data/repository/chat/message_repository.dart';
 
-part 'chat_state.dart';
+part 'message_state.dart';
 
-class ChatCubit extends Cubit<ChatState> {
-  final ChatRepo repo;
+class MessageCubit extends Cubit<MessageState> {
+  final MessageRepository repo;
 
   List<Message> messages = [];
 
   bool isError = false;
 
-  ChatCubit(this.repo) : super(ChatInitial());
+  MessageCubit(this.repo) : super(MessageInitial());
 
   Future<void> sendQuery(String text) async {
     final userMessage =
         Message(isBot: true, timestamp: DateTime.now(), payload: text);
 
     messages.add(userMessage);
-    emit(ChatQueryLoading());
+    emit(MessageQueryLoading());
     try {
       final result = await repo.queryPrompt(text);
 
@@ -33,9 +33,9 @@ class ChatCubit extends Cubit<ChatState> {
 
       messages.add(botMessage);
 
-      emit(ChatQueryLoaded());
+      emit(MessageQueryLoaded());
     } catch (e) {
-      emit(QueryResultError(message: e.toString()));
+      emit(MessageQueryResultError(message: e.toString()));
     }
   }
 
