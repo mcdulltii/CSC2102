@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/data/repository/auth/auth_repo.dart';
+import 'package:frontend/presentation/navigation/starter_screen.dart';
 import 'package:frontend/presentation/screens/auth/pages/welcome_page.dart';
+import 'package:frontend/presentation/screens/chat/pages/chat_page.dart';
 
 import 'data/repository/chat/message_repository.dart';
 import 'logic/auth/auth_cubit.dart';
@@ -19,22 +21,22 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
-          create: (context) => MessageRepository(),
+          create: (context) => AuthRepository(),
         ),
         RepositoryProvider(
-          create: (context) => AuthRepository(),
+          create: (context) => MessageRepository(),
         ),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => MessageCubit(
-              RepositoryProvider.of<MessageRepository>(context),
+            create: (context) => AuthCubit(
+              RepositoryProvider.of<AuthRepository>(context),
             ),
           ),
           BlocProvider(
-            create: (context) => AuthCubit(
-              RepositoryProvider.of<AuthRepository>(context),
+            create: (context) => MessageCubit(
+              RepositoryProvider.of<MessageRepository>(context),
             ),
           ),
         ],
@@ -44,7 +46,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             useMaterial3: true,
           ),
-          home: const WelcomePage(),
+          home: const StarterPage(),
         ),
       ),
     );

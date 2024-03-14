@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:frontend/data/model/chat.dart';
 
 class CustomNavigationDrawer extends StatefulWidget {
-  const CustomNavigationDrawer({super.key});
+  final Function signoutCallback;
+
+  const CustomNavigationDrawer({super.key, required this.signoutCallback});
 
   @override
   State<CustomNavigationDrawer> createState() => _CustomNavigationDrawerState();
@@ -37,26 +39,32 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [buildHeader(context), buildMenuItems(context)],
+          children: [
+            buildHeader(context),
+            buildMenuItems(context),
+            buildSignOutButton(context, widget.signoutCallback),
+          ],
         ),
       ),
     );
   }
 
   Widget buildHeader(BuildContext context) => Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top,
-      ),
-      child: ElevatedButton(
-        onPressed: () {},
-        child: const Row(
+        padding: EdgeInsets.only(
+          top: MediaQuery.of(context).padding.top,
+        ),
+        child: ElevatedButton(
+          onPressed: () {},
+          child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text("New Chat"),
               SizedBox(width: 20),
               Icon(Icons.post_add)
-            ]),
-      ));
+            ],
+          ),
+        ),
+      );
 
   Widget buildMenuItems(BuildContext context) => Expanded(
         child: ListView.builder(
@@ -104,6 +112,15 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
       ),
     );
   }
+
+  Widget buildSignOutButton(BuildContext context, Function callback) =>
+      Container(
+        margin: const EdgeInsets.only(bottom: 40),
+        child: ElevatedButton(
+          onPressed: () => callback(),
+          child: const Text('Sign Out'),
+        ),
+      );
 
   Map<String, List<Chat>> segmentChatHistory(List<Chat> chatHistory) {
     Map<String, List<Chat>> segments = {

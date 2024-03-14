@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:frontend/data/model/message.dart';
+import 'package:frontend/logic/auth/auth_cubit.dart';
 import 'package:frontend/logic/message/message_cubit.dart';
 import 'package:frontend/presentation/helpers/keyboard_dimiss.dart';
+import 'package:frontend/presentation/helpers/navigate_with_transition.dart';
+import 'package:frontend/presentation/screens/auth/pages/welcome_page.dart';
 import 'package:frontend/presentation/screens/chat/components/drawer.dart';
 import 'package:frontend/presentation/screens/chat/components/text_bubble.dart';
 import 'package:frontend/presentation/screens/chat/components/type_bar.dart';
@@ -19,12 +22,14 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   late MessageCubit cubit;
+  late AuthCubit authCubit;
 
   TextEditingController editingController = TextEditingController();
 
   @override
   void initState() {
     cubit = BlocProvider.of<MessageCubit>(context);
+    authCubit = BlocProvider.of<AuthCubit>(context);
     super.initState();
   }
 
@@ -39,7 +44,12 @@ class _ChatPageState extends State<ChatPage> {
               style: TextStyle(fontSize: 26),
             ),
           ),
-          drawer: const CustomNavigationDrawer(),
+          drawer: CustomNavigationDrawer(
+            signoutCallback: () {
+              authCubit.signout;
+              navigateWithFadeTransition(context, const WelcomePage());
+            },
+          ),
           body: Column(
             children: [
               SizedBox(

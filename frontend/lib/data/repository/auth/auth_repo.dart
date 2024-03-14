@@ -1,17 +1,19 @@
 import 'dart:convert';
-
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
+import 'package:frontend/logic/helper/auth_helper.dart';
 import 'package:frontend/constants/api.dart';
 
 class AuthRepository {
+  final Dio _dio = Dio();
+
   Future<void> signUp(String email, String password) async {
     try {
-      final response = await http.post(
-        Uri.parse('$SERVER_BASE_URL/addNewUser'),
-        body: {'userEmail': email, 'userPassword': password},
+      final response = await _dio.post(
+        'http://localhost:8000/api/addNewUser',
+        data: {'userEmail': email, 'userPassword': password},
       );
-      if (response.statusCode != 200) {
+      print(response.data);
+      if (response.statusCode != 201) {
         throw Exception('Failed to sign up');
       }
     } catch (e) {
@@ -21,39 +23,33 @@ class AuthRepository {
 
   Future<void> signIn(String email, String password) async {
     try {
-      final response = await http.post(
-        Uri.parse('$SERVER_BASE_URL/login'),
-        body: {'userEmail': email, 'userPassword': password},
+      final response = await _dio.post(
+        'http://localhost:8000/api/login',
+        data: {'userEmail': email, 'userPassword': password},
       );
-      if (response.statusCode != 200) {
-        throw Exception('Failed to sign in');
-      } else {
-        final responseData = json.decode(response.body);
-        final userId = responseData['user_id'];
-        await _saveUserIdToLocalStorage(
-            userId); // Save user_id to local storage
 
-        String? userID = await getUserIdFromLocalStorage();
-        if (userID != null) {
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+        final bool loginResult = responseData['result'];
+        if (loginResult == true) {
+          final userId = responseData['user_id'];
+          await saveUserIdToLocalStorage(
+              userId); // Save user_id to local storage
+
+          String? userID = await getUserIdFromLocalStorage();
           // Use the userId
-          print("userID");
+          print(userID);
         } else {
-          // User_id not found in local storage
-          print("userID is not saved into Local Storage");
+          throw Exception('Login failed: ${responseData['message']}');
         }
+      } else {
+        throw Exception('Failed to sign in');
       }
     } catch (e) {
       throw Exception('Failed to sign in: $e');
     }
   }
-
-  Future<void> _saveUserIdToLocalStorage(String userId) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('user_id', userId);
-  }
-
-  Future<String?> getUserIdFromLocalStorage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('user_id');
+  Future<void> signout() async {
+    
   }
 }

@@ -8,7 +8,7 @@ import '../components/custom_scaffold.dart';
 import 'signin_page.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+  const SignUpPage({Key? key}) : super(key: key);
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -33,10 +33,13 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
+        ScaffoldMessenger.of(context)
+            .removeCurrentSnackBar(); // Remove previous Snackbars
         if (state is AuthSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Sign up successful'),
+              duration: Duration(milliseconds: 500), // Shorten duration
             ),
           );
           navigateWithFadeTransition(context, const SignInPage());
@@ -44,6 +47,7 @@ class _SignUpPageState extends State<SignUpPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Sign up failed. Please try again.'),
+              duration: Duration(milliseconds: 500), // Shorten duration
             ),
           );
         }

@@ -9,7 +9,7 @@ import 'package:frontend/presentation/theme/theme.dart';
 import '../../chat/pages/chat_page.dart';
 
 class SignInPage extends StatefulWidget {
-  const SignInPage({super.key});
+  const SignInPage({Key? key}) : super(key: key);
 
   @override
   State<SignInPage> createState() => _SignInPageState();
@@ -26,10 +26,13 @@ class _SignInPageState extends State<SignInPage> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
+        ScaffoldMessenger.of(context)
+            .removeCurrentSnackBar(); // Remove previous Snackbars
         if (state is AuthSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Authentication successful'),
+              duration: Duration(milliseconds: 500), // Shorten duration
             ),
           );
           navigateWithFadeTransition(context, const ChatPage());
@@ -37,6 +40,7 @@ class _SignInPageState extends State<SignInPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Something went wrong. Please try again.'),
+              duration: Duration(milliseconds: 500), // Shorten duration
             ),
           );
         }
