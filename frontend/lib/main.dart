@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/data/repository/auth/auth_repo.dart';
 import 'package:frontend/presentation/navigation/starter_screen.dart';
-import 'package:frontend/presentation/screens/auth/pages/welcome_page.dart';
-import 'package:frontend/presentation/screens/chat/pages/chat_page.dart';
+import 'package:frontend/data/repository/chat/chat_repository.dart';
+import 'package:frontend/data/repository/chat/message_repository.dart';
+import 'package:frontend/logic/chat/chat_bloc.dart';
 
-import 'data/repository/chat/message_repository.dart';
 import 'logic/auth/auth_cubit.dart';
 import 'logic/message/message_cubit.dart';
 
@@ -20,24 +20,24 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider(
-          create: (context) => AuthRepository(),
-        ),
-        RepositoryProvider(
-          create: (context) => MessageRepository(),
-        ),
+        RepositoryProvider(create: (context) => AuthRepository()),
+        RepositoryProvider(create: (context) => MessageRepository()),
+        RepositoryProvider(create: (context) => ChatRepository()),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => AuthCubit(
-              RepositoryProvider.of<AuthRepository>(context),
-            ),
-          ),
+              create: (context) => AuthCubit(
+                    RepositoryProvider.of<AuthRepository>(context),
+                  )),
           BlocProvider(
             create: (context) => MessageCubit(
               RepositoryProvider.of<MessageRepository>(context),
             ),
+          ),
+          BlocProvider(
+            create: (context) =>
+                ChatBloc(RepositoryProvider.of<ChatRepository>(context)),
           ),
         ],
         child: MaterialApp(

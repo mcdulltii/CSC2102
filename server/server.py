@@ -229,6 +229,26 @@ def update_chat_title():
         return {"result": False, "error": "Failed to update chat title"}, 500
 
 
+@app.route("/api/deleteChat", methods=["DELETE"])
+@cross_origin()
+def delete_chat():
+    global db
+    # Requires chat ID
+    chat_id = request.args.get("chatId")
+
+    if not chat_id:
+        return {"result": False, "error": "Chat ID is required"}, 400
+
+    chats_collection = db.chats
+
+    try:
+        chats_collection.delete_one({"_id": ObjectId(chat_id)})
+        return {"result": True, "message": "Chat deleted successfully"}, 200
+    except Exception as e:
+        print(e)
+        return {"result": False, "error": "Failed to create chat"}, 500
+
+
 @app.route("/api/createMessage", methods=["POST"])
 @cross_origin()
 def create_message():

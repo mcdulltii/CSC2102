@@ -28,7 +28,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> signout() async {
     try {
-      removeUserIdFromLocalStorage();
+      await removeUserIdFromLocalStorage();
       emit(SignOutSuccess());
     } catch (e) {
       emit(AuthFailure(e.toString()));

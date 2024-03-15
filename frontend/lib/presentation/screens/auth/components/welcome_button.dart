@@ -13,7 +13,6 @@ class WelcomeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print("Pressed");
         navigateWithFadeTransition(context, onTap!);
       },
       child: Container(

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:frontend/data/model/message.dart';
 import 'package:frontend/logic/auth/auth_cubit.dart';
+import 'package:frontend/logic/helper/auth_helper.dart';
 import 'package:frontend/logic/message/message_cubit.dart';
 import 'package:frontend/presentation/helpers/keyboard_dimiss.dart';
 import 'package:frontend/presentation/helpers/navigate_with_transition.dart';
@@ -46,7 +47,8 @@ class _ChatPageState extends State<ChatPage> {
           ),
           drawer: CustomNavigationDrawer(
             signoutCallback: () {
-              authCubit.signout;
+              // authCubit.signout;
+              removeUserIdFromLocalStorage();
               navigateWithFadeTransition(context, const WelcomePage());
             },
           ),

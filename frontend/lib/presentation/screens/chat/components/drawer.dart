@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/data/model/chat.dart';
+import 'package:frontend/logic/chat/chat_bloc.dart';
+import 'package:frontend/logic/chat/chat_event.dart';
+import 'package:frontend/logic/chat/chat_state.dart';
+import 'package:frontend/logic/helper/auth_helper.dart';
 
 class CustomNavigationDrawer extends StatefulWidget {
   final Function signoutCallback;
@@ -11,25 +16,25 @@ class CustomNavigationDrawer extends StatefulWidget {
 }
 
 class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
-  List<Chat> chatHistory = [
-    Chat(
-        id: '1', title: 'Medical Needs Appointment', timestamp: DateTime.now()),
-    Chat(
-        id: '2',
-        title: 'Medical Needs Query String',
-        timestamp: (DateTime.now()).subtract(const Duration(days: 7))),
-    Chat(
-        id: '3',
-        title: 'Medical Needs Help Is Me',
-        timestamp: (DateTime.now()).subtract(const Duration(days: 30)))
-  ];
-
-  late Map<String, List<Chat>> formatChat;
+  late String _userId;
+  late final ChatBloc _chatBloc;
 
   @override
   void initState() {
     super.initState();
-    formatChat = segmentChatHistory(chatHistory);
+    _initialize(); // Call to initialize user ID
+  }
+
+  Future<void> _initialize() async {
+    final userId = await getUserIdFromLocalStorage();
+
+    setState(() {
+      _userId = userId ?? '';
+      _chatBloc = BlocProvider.of<ChatBloc>(
+          context); // Initialize _chatBloc after _userId is set
+      _chatBloc
+          .add(ChatRetrieved("", _userId)); // Add event after _userId is set
+    });
   }
 
   @override
@@ -54,7 +59,14 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
           top: MediaQuery.of(context).padding.top,
         ),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            Chat chat = Chat(
+                id: "",
+                userId: _userId,
+                title: "Untitled Chat",
+                timestamp: DateTime.now());
+            _chatBloc.add(ChatCreated(chat));
+          },
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -66,48 +78,92 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
         ),
       );
 
-  Widget buildMenuItems(BuildContext context) => Expanded(
-        child: ListView.builder(
-          itemCount: formatChat.length,
-          itemBuilder: (context, index) {
-            final category = formatChat.keys.elementAt(index);
-            final chats = formatChat[category]!;
+  Widget buildMenuItems(BuildContext context) =>
+      BlocBuilder<ChatBloc, ChatState>(
+        builder: (context, state) {
+          if (state is ChatLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is ChatLoaded) {
+            final chats = state.chats;
+            final formatChat = segmentChatHistory(chats);
 
-            return chats.isNotEmpty
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Text(
-                          category,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: chats.length,
-                        itemBuilder: (context, index) => getRow(chats[index]),
-                      ),
-                    ],
-                  )
-                : Container();
-          },
-        ),
+            return Expanded(
+              child: ListView.builder(
+                itemCount: formatChat.length,
+                itemBuilder: (context, index) {
+                  final category = formatChat.keys.elementAt(index);
+                  final chats = formatChat[category]!;
+
+                  return chats.isNotEmpty
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Text(
+                                category,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: chats.length,
+                              itemBuilder: (context, index) =>
+                                  getRow(state, chats[index]),
+                            ),
+                          ],
+                        )
+                      : Container();
+                },
+              ),
+            );
+          } else if (state is ChatSuccess) {
+            // reload the list of chats
+            _chatBloc.add(ChatRetrieved("", _userId));
+          } else if (state is ChatError) {
+            return Center(child: Text(state.errorMessage));
+          } else {
+            return Container();
+          }
+
+          return Container();
+        },
       );
 
-  Widget getRow(Chat chat) {
+  Widget getRow(ChatState state, Chat chat) {
     return ListTile(
       title: Row(
         children: [
-          Expanded(child: Text(chat.title)),
-          const Icon(Icons.edit),
+          if (state is ChatLoaded && state.id == chat.id)
+            Expanded(
+              child: TextField(
+                controller: TextEditingController(text: chat.title),
+                onSubmitted: (newTitle) {
+                  _chatBloc.add(ChatUpdated(chat.copyWith(title: newTitle)));
+                },
+              ),
+            )
+          else
+            Expanded(
+              child: Text(chat.title),
+            ),
+          IconButton(
+            onPressed: () {
+              _chatBloc.add(ChatRetrieved(chat.id, _userId));
+            },
+            icon: const Icon(Icons.edit),
+          ),
           const SizedBox(width: 10),
-          const Icon(Icons.delete)
+          IconButton(
+            onPressed: () {
+              _chatBloc.add(ChatDeleted(chat.id));
+            },
+            icon: const Icon(Icons.delete),
+          ),
         ],
       ),
     );
