@@ -8,4 +8,6 @@ WORKDIR /server
 COPY . .
 RUN pip install -r requirements.txt
 
+EXPOSE 8000
+
 ENTRYPOINT ["/wait-for-it.sh", "mongodb:27017", "-t", "100", "--", "python", "server.py"]

@@ -68,7 +68,7 @@ SIT CSC2101 (Professional Software Development and Team Project 2)
 
 3. Create K8s namespace
 
-    `kubectl apply -f ./namespace-yaml`
+    `kubectl apply -f ./namespace.yaml`
 
 4. Start K8s replicasets and statefulsets
 
