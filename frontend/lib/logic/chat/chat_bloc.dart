@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+
 import 'package:frontend/data/repository/chat/chat_repository.dart';
 import 'package:frontend/logic/chat/chat_event.dart';
 import 'package:frontend/logic/chat/chat_state.dart';
@@ -11,7 +12,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       try {
         emit(ChatLoading());
         final chats = await _chatRepository.retrieveChats(event.userId);
-        print("i am called loaded: ${event.userId}");
         emit(ChatLoaded(event.id, chats));
       } catch (e) {
         emit(ChatError('Failed to load chats: $e'));

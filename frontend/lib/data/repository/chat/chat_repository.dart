@@ -2,15 +2,14 @@ import 'dart:convert';
 
 import 'package:frontend/constants/api.dart';
 import 'package:frontend/data/model/chat.dart';
+
 import 'package:http/http.dart' as http;
 
 class ChatRepository {
-  final String baseUrl = CHAT_BASE_URL;
-
   Future<List<Chat>> retrieveChats(String userId) async {
     try {
-      final response =
-          await http.get(Uri.parse("$baseUrl/api/getAllChats?userId=$userId"));
+      final response = await http
+          .get(Uri.parse("$SERVER_BASE_URL/api/getAllChats?userId=$userId"));
 
       if (response.statusCode == 200) {
         final body = json.decode(response.body) as List;
@@ -34,11 +33,12 @@ class ChatRepository {
 
   Future<void> createChat(Chat chat) async {
     try {
-      final response = await http.post(Uri.parse("$baseUrl/api/addNewChat"),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode(chat.toJson()));
+      final response =
+          await http.post(Uri.parse("$SERVER_BASE_URL/api/addNewChat"),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+              },
+              body: jsonEncode(chat.toJson()));
 
       if (response.statusCode != 201) {
         throw Exception("Faild to create chat");
@@ -50,11 +50,12 @@ class ChatRepository {
 
   Future<void> updateChat(Chat chat) async {
     try {
-      final response = await http.put(Uri.parse("$baseUrl/api/updateChatTitle"),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode(chat.toJson()));
+      final response =
+          await http.put(Uri.parse("$SERVER_BASE_URL/api/updateChatTitle"),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+              },
+              body: jsonEncode(chat.toJson()));
 
       if (response.statusCode != 200) {
         throw Exception("Faild to update chat");
@@ -66,8 +67,8 @@ class ChatRepository {
 
   Future<void> deleteChat(String id) async {
     try {
-      final response =
-          await http.delete(Uri.parse("$baseUrl/api/deleteChat?chatId=$id"));
+      final response = await http
+          .delete(Uri.parse("$SERVER_BASE_URL/api/deleteChat?chatId=$id"));
 
       if (response.statusCode != 200) {
         throw Exception("Failed to delete chat");

@@ -1,5 +1,5 @@
-import 'dart:convert';
 import 'package:dio/dio.dart';
+
 import 'package:frontend/logic/helper/auth_helper.dart';
 import 'package:frontend/constants/api.dart';
 
@@ -9,10 +9,9 @@ class AuthRepository {
   Future<void> signUp(String email, String password) async {
     try {
       final response = await _dio.post(
-        'http://localhost:8000/api/addNewUser',
+        '$SERVER_BASE_URL/api/addNewUser',
         data: {'userEmail': email, 'userPassword': password},
       );
-      print(response.data);
       if (response.statusCode != 201) {
         throw Exception('Failed to sign up');
       }
@@ -24,7 +23,7 @@ class AuthRepository {
   Future<void> signIn(String email, String password) async {
     try {
       final response = await _dio.post(
-        'http://localhost:8000/api/login',
+        '$SERVER_BASE_URL/api/login',
         data: {'userEmail': email, 'userPassword': password},
       );
 
@@ -49,7 +48,6 @@ class AuthRepository {
       throw Exception('Failed to sign in: $e');
     }
   }
-  Future<void> signout() async {
-    
-  }
+
+  Future<void> signout() async {}
 }

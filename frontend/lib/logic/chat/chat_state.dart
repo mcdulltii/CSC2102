@@ -13,12 +13,6 @@ final class ChatLoaded extends ChatState {
   ChatLoaded(this.id, this.chats);
 }
 
-final class ChatEditing extends ChatState {
-  final String id;
-
-  ChatEditing(this.id);
-}
-
 final class ChatSuccess extends ChatState {
   final String message;
 

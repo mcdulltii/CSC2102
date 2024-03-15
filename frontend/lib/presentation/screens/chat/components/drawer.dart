@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:frontend/data/model/chat.dart';
 import 'package:frontend/data/repository/chat/chat_repository.dart';
 import 'package:frontend/logic/chat/chat_bloc.dart';
 import 'package:frontend/logic/chat/chat_event.dart';
 import 'package:frontend/logic/chat/chat_state.dart';
 import 'package:frontend/logic/helper/auth_helper.dart';
+import 'package:frontend/presentation/helpers/segment_chat_history.dart';
 
 class CustomNavigationDrawer extends StatefulWidget {
   final Function signoutCallback;
@@ -181,28 +183,4 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
           child: const Text('Sign Out'),
         ),
       );
-
-  Map<String, List<Chat>> segmentChatHistory(List<Chat> chatHistory) {
-    Map<String, List<Chat>> segments = {
-      '7 Days': [],
-      '30 Days': [],
-      'Older Messages': []
-    };
-
-    DateTime now = DateTime.now();
-
-    for (Chat chat in chatHistory) {
-      int daysDifference = now.difference(chat.timestamp).inDays;
-
-      if (daysDifference <= 7) {
-        segments['7 Days']?.add(chat);
-      } else if (daysDifference <= 30) {
-        segments['30 Days']?.add(chat);
-      } else {
-        segments['Older Messages']?.add(chat);
-      }
-    }
-
-    return segments;
-  }
 }

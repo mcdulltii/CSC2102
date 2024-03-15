@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:frontend/presentation/helpers/navigate_with_transition.dart';
 
-import '../../../../logic/auth/auth_cubit.dart';
-import '../../../theme/theme.dart';
-import '../components/custom_scaffold.dart';
-import 'signin_page.dart';
+import 'package:frontend/logic/auth/auth_cubit.dart';
+import 'package:frontend/presentation/helpers/navigate_with_transition.dart';
+import 'package:frontend/presentation/screens/auth/components/custom_scaffold.dart';
+import 'package:frontend/presentation/screens/auth/pages/signin_page.dart';
+import 'package:frontend/presentation/theme/theme.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);

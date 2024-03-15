@@ -1,19 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:frontend/constants/api.dart';
+
 import 'package:http/http.dart' as http;
 
 class MessageRepository {
-  final String baseurl = BOT_BASE_URL;
-
   MessageRepository();
 
   Future<String> queryPrompt(String prompt) async {
     try {
       final response = await http
           .post(
-            Uri.parse('$baseurl/api/getModelInf'),
+            Uri.parse('$BOT_BASE_URL/api/getModelInf'),
             headers: {
               HttpHeaders.contentTypeHeader: 'application/json',
               // TO DO: IMPLEMENT AFTER DATABASE IS SET-UP

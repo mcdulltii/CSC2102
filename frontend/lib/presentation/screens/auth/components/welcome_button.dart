@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:frontend/presentation/helpers/navigate_with_transition.dart';
 
 class WelcomeButton extends StatelessWidget {
