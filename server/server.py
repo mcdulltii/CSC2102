@@ -48,7 +48,7 @@ def connect_db_mariadb():
         # Connect to Mariadb
         conn = mysql.connector.connect(
             user="root",
-            password="secret",
+            password="password",
             host="mariadb",
             database="mysql_db"
         )

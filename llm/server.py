@@ -3,7 +3,6 @@ from starlette.responses import JSONResponse
 from starlette.routing import Route
 import asyncio
 import torch
-import tensorflow as tf
 from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
 import logging
 
@@ -90,8 +89,6 @@ app = Starlette(
 
 @app.on_event("startup")
 async def startup_event() -> None:
-    # Assert GPU detected
-    assert len(tf.config.list_physical_devices('GPU')) > 0
 
     # Initialize LLM
     logging.info("Initializing Dr_Samantha model")

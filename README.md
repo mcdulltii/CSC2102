@@ -30,9 +30,13 @@ SIT CSC2101 (Professional Software Development and Team Project 2)
 
 4. Run "nvidia-smi" on the terminal to confirm that the necessary drivers have been properly installed.
 
-5. If your GPU details do not show up, it means you did not properly install the drivers, Go back to step 2. Else, visit Nvidia's website to install the [CUDA toolkit](https://developer.nvidia.com/cuda-downloads) and [cuDNN](https://developer.nvidia.com/cudnn) drivers from Nvidia directly and add them to your system PATH
+5. It is important to note that the NVIDIA cuda toolkit installation steps do not work as they install the newest versions of the toolkit for usage. However, it is very important to understand that Pytorch and Tensorflow is very sensitive to the version of the CUDA toolkit and cuDNN versions, in particular the newer versions or the installation will just NOT work and default to use the CPU instead. So make sure to install the proper version of the [CUDA toolkit 11.8.0](https://developer.nvidia.com/cuda-11-8-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=WSL-Ubuntu&target_version=2.0&target_type=deb_local) and [cuDNN 11.9](https://developer.nvidia.com/cudnn)
+![cuDNN installation](images/cudnn.png)
+Skip the last step `sudo apt-get -y install cudnn` and move to the step to do `sudo apt-get -y install cudnn-cuda-11` instead. This is to make sure that you have consistent cuda drivers for the project, being at 11.8.0 for the toolkit.
 
 6. Bring up Windows Powershell again and navigate yourself to the current User of the computer (i.e: C:\Users\Alice) folder and create a new file called [.wslconfig](./images/wslconfig_file.PNG)
+![wslconfig](images/wslconfig_file.PNG)
+This is to increase the amount of virtual memory for any WSL or docker containers depending on the size of the model/project you intend to use this for.
 
 7. Configure the amount of memory and swap space as required such that the model is able to properly fit within the physical constraints available to your hardware
 
@@ -40,15 +44,9 @@ SIT CSC2101 (Professional Software Development and Team Project 2)
 
 ## Docker Setup For GPU usage
 
-1. If you have yet to do so, use a web browser, download Docker-desktop from their [website](https://www.docker.com/products/docker-desktop/) and install ```docker``` and ```docker-compose``` to run the microservice containers
+1. If you have yet to do so, use a web browser, download Docker-desktop from their [website](https://www.docker.com/products/docker-desktop/) and install ```docker``` and ```docker-compose``` to run the microservice containers, remember to also enable wsl integration with your distro and enable kubernetes in the settings as well.
 
-2. Using wsl, and following the cloud-native guide provided by [Nvidia](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt) to enable docker for cuda ready workloads
-
-    - 1. Installing with the [apt-get](./images/aptget.png) package manager
-
-    - 2. Configuring the [docker daemon and containerd](./images/docker_daemon.png)
-
-3. Check for successful installation by running ```sudo docker run --rm --gpus all ubuntu nvidia-smi```, if a table like [this](./images/nvidiasmi.png) does not show up as an echo from your docker container, perhaps you have missed a step somewhere in the installation process.
+2. Using wsl, check for successful installation by running ```sudo docker run --rm --runtime=nvidia --gpus all ubuntu nvidia-smi```, if a table like [this](./images/nvidiasmi.png) does not show up as an echo from your docker container, perhaps you have missed a step somewhere in the installation process. At bare minimum, you should be able to run nvidia-smi on your wsl terminal.
 
 ## Running the services
 
