@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/data/model/chat.dart';
+import 'package:frontend/data/repository/chat/chat_repository.dart';
 import 'package:frontend/logic/chat/chat_bloc.dart';
 import 'package:frontend/logic/chat/chat_event.dart';
 import 'package:frontend/logic/chat/chat_state.dart';
@@ -22,19 +23,21 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
   @override
   void initState() {
     super.initState();
-    _initialize(); // Call to initialize user ID
+    _chatBloc = ChatBloc(RepositoryProvider.of<ChatRepository>(context));
+    _initialize();
   }
 
   Future<void> _initialize() async {
-    final userId = await getUserIdFromLocalStorage();
-
-    setState(() {
+    await getUserIdFromLocalStorage().then((userId) {
       _userId = userId ?? '';
-      _chatBloc = BlocProvider.of<ChatBloc>(
-          context); // Initialize _chatBloc after _userId is set
-      _chatBloc
-          .add(ChatRetrieved("", _userId)); // Add event after _userId is set
+      _chatBloc.add(ChatRetrieved("", _userId));
     });
+  }
+
+  @override
+  void dispose() {
+    _chatBloc.close();
+    super.dispose();
   }
 
   @override
@@ -80,6 +83,7 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
 
   Widget buildMenuItems(BuildContext context) =>
       BlocBuilder<ChatBloc, ChatState>(
+        bloc: _chatBloc,
         builder: (context, state) {
           if (state is ChatLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -157,7 +161,7 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
             },
             icon: const Icon(Icons.edit),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 1),
           IconButton(
             onPressed: () {
               _chatBloc.add(ChatDeleted(chat.id));
