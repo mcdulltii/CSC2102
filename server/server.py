@@ -104,7 +104,7 @@ def add_new_user():
     user_data = request.get_json()
 
     if "userEmail" not in user_data or "userPassword" not in user_data or not validate_email(user_data["userEmail"]) or not is_valid_password(user_data["userPassword"]):
-        return {"result": False, "error": "Invalid or missing email/password"}, 400
+        return {"result": False, "error": "Invalid or missing email/password"}, 401
 
     # Hash the password using bcrypt
     hashed_password = bcrypt.generate_password_hash(user_data["userPassword"]).decode("utf-8")
@@ -135,7 +135,7 @@ def login():
     login_data = request.get_json()
 
     if "userEmail" not in login_data or "userPassword" not in login_data:
-        return {"result": False, "error": "User email and password are required"}, 400
+        return {"result": False, "error": "User email and password are required"}, 401
 
     with db_mariadb.cursor(dictionary=True) as cursor:
         try:
