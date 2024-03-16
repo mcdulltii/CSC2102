@@ -50,7 +50,7 @@ class _ChatPageState extends State<ChatPage> {
           drawer: CustomNavigationDrawer(
             signoutCallback: () {
               // authCubit.signout;
-              removeUserIdFromLocalStorage();
+              removeIdsFromLocalStorage();
               navigateWithFadeTransition(context, const WelcomePage());
             },
           ),

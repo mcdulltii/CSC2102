@@ -7,6 +7,7 @@ import 'package:frontend/logic/chat/chat_bloc.dart';
 import 'package:frontend/logic/chat/chat_event.dart';
 import 'package:frontend/logic/chat/chat_state.dart';
 import 'package:frontend/logic/helper/auth_helper.dart';
+import 'package:frontend/logic/helper/chat_helper.dart';
 import 'package:frontend/presentation/helpers/segment_chat_history.dart';
 
 class CustomNavigationDrawer extends StatefulWidget {
@@ -88,7 +89,8 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
         bloc: _chatBloc,
         builder: (context, state) {
           if (state is ChatLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Expanded(
+                child: Center(child: CircularProgressIndicator()));
           } else if (state is ChatLoaded) {
             final chats = state.chats;
             final formatChat = segmentChatHistory(chats);
@@ -119,7 +121,7 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: chats.length,
                               itemBuilder: (context, index) =>
-                                  getRow(state, chats[index]),
+                                  getRow(context, state, chats[index]),
                             ),
                           ],
                         )
@@ -131,31 +133,41 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
             // reload the list of chats
             _chatBloc.add(ChatRetrieved("", _userId));
           } else if (state is ChatError) {
-            return Center(child: Text(state.errorMessage));
+            return Expanded(child: Center(child: Text(state.errorMessage)));
           } else {
-            return Container();
+            return Expanded(child: Container());
           }
 
-          return Container();
+          return Expanded(child: Container());
         },
       );
 
-  Widget getRow(ChatState state, Chat chat) {
+  Widget getRow(BuildContext context, ChatState state, Chat chat) {
     return ListTile(
       title: Row(
         children: [
           if (state is ChatLoaded && state.id == chat.id)
             Expanded(
               child: TextField(
+                autofocus: true,
                 controller: TextEditingController(text: chat.title),
                 onSubmitted: (newTitle) {
                   _chatBloc.add(ChatUpdated(chat.copyWith(title: newTitle)));
+                },
+                onTapOutside: (_) {
+                  _chatBloc.add(ChatRetrieved("", _userId));
                 },
               ),
             )
           else
             Expanded(
-              child: Text(chat.title),
+              child: TextButton(
+                onPressed: () async {
+                  await saveChatIdToLocalStorage(chat.id)
+                      .then((_) => Navigator.of(context).pop());
+                },
+                child: Text(chat.title),
+              ),
             ),
           IconButton(
             onPressed: () {
