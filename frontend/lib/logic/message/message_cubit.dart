@@ -17,7 +17,7 @@ class MessageCubit extends Cubit<MessageState> {
 
   Future<void> sendQuery(String text) async {
     final userMessage =
-        Message(isBot: true, timestamp: DateTime.now(), payload: text);
+        Message(isBot: false, timestamp: DateTime.now(), payload: text);
 
     // save user Message
     // repo.createMessage(chatId, isBot, payload, timestamp)
@@ -30,15 +30,15 @@ class MessageCubit extends Cubit<MessageState> {
       _checkError(result);
 
       final botMessage = Message(
-        isBot: false,
+        isBot: true,
         timestamp: DateTime.now(),
         payload: result,
       );
 
       messages.add(botMessage);
 
-    // save bot Message
-    // repo.createMessage(chatId, isBot, payload, timestamp)
+      // save bot Message
+      // repo.createMessage(chatId, isBot, payload, timestamp)
 
       emit(MessageQueryLoaded());
     } catch (e) {

@@ -86,9 +86,10 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                   itemBuilder: (context, Message message) => Align(
                     alignment: message.isBot
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
+                        ? Alignment.centerLeft
+                        : Alignment.centerRight,
                     child: TextBubble(
+                      isBot: message.isBot,
                       text: message.payload,
                     ),
                   ),
