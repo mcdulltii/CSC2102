@@ -56,11 +56,11 @@ class _ChatPageState extends State<ChatPage> {
           ),
           body: Column(
             children: [
-              SizedBox(
-                width: 300,
-                height: 300,
-                child: Image.asset("assets/robot.gif", fit: BoxFit.cover),
-              ),
+              // SizedBox(
+              //   width: 300,
+              //   height: 300,
+              //   child: Image.asset("assets/robot.gif", fit: BoxFit.cover),
+              // ),
               Expanded(
                 child: GroupedListView(
                   padding: const EdgeInsets.all(10),

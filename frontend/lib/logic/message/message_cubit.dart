@@ -19,6 +19,9 @@ class MessageCubit extends Cubit<MessageState> {
     final userMessage =
         Message(isBot: true, timestamp: DateTime.now(), payload: text);
 
+    // save user Message
+    // repo.createMessage(chatId, isBot, payload, timestamp)
+
     messages.add(userMessage);
     emit(MessageQueryLoading());
     try {
@@ -33,6 +36,9 @@ class MessageCubit extends Cubit<MessageState> {
       );
 
       messages.add(botMessage);
+
+    // save bot Message
+    // repo.createMessage(chatId, isBot, payload, timestamp)
 
       emit(MessageQueryLoaded());
     } catch (e) {

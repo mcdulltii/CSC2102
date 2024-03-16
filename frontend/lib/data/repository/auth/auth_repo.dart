@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
 
 import 'package:frontend/logic/helper/auth_helper.dart';
-import 'package:frontend/constants/api.dart';
+
+import '../../../constants/api.dart';
 
 class AuthRepository {
   final Dio _dio = Dio();
