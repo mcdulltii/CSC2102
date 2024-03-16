@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM pytorch/pytorch:latest
 
 WORKDIR /server
 
