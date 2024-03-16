@@ -6,7 +6,7 @@ import 'package:frontend/data/model/chat.dart';
 import 'package:http/http.dart' as http;
 
 class ChatRepository {
-  final String botUrl = CHAT_BASE_URL;
+  final String botUrl = BOT_BASE_URL;
 
   Future<List<Chat>> retrieveChats(String userId) async {
     try {
@@ -35,20 +35,13 @@ class ChatRepository {
 
   Future<void> createChat(Chat chat) async {
     try {
-<<<<<<< Updated upstream
       final response =
           await http.post(Uri.parse("$SERVER_BASE_URL/api/addNewChat"),
               headers: <String, String>{
                 'Content-Type': 'application/json; charset=UTF-8',
               },
               body: jsonEncode(chat.toJson()));
-=======
-      final response = await http.post(Uri.parse("$botUrl/api/addNewChat"),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode(chat.toJson()));
->>>>>>> Stashed changes
+
 
       if (response.statusCode != 201) {
         throw Exception("Faild to create chat");
@@ -60,20 +53,13 @@ class ChatRepository {
 
   Future<void> updateChat(Chat chat) async {
     try {
-<<<<<<< Updated upstream
       final response =
           await http.put(Uri.parse("$SERVER_BASE_URL/api/updateChatTitle"),
               headers: <String, String>{
                 'Content-Type': 'application/json; charset=UTF-8',
               },
               body: jsonEncode(chat.toJson()));
-=======
-      final response = await http.put(Uri.parse("$botUrl/api/updateChatTitle"),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode(chat.toJson()));
->>>>>>> Stashed changes
+
 
       if (response.statusCode != 200) {
         throw Exception("Faild to update chat");
@@ -85,13 +71,9 @@ class ChatRepository {
 
   Future<void> deleteChat(String id) async {
     try {
-<<<<<<< Updated upstream
       final response = await http
           .delete(Uri.parse("$SERVER_BASE_URL/api/deleteChat?chatId=$id"));
-=======
-      final response =
-          await http.delete(Uri.parse("$botUrl/api/deleteChat?chatId=$id"));
->>>>>>> Stashed changes
+
 
       if (response.statusCode != 200) {
         throw Exception("Failed to delete chat");

@@ -7,12 +7,9 @@ import 'package:frontend/constants/api.dart';
 import 'package:http/http.dart' as http;
 
 class MessageRepository {
-<<<<<<< Updated upstream
-=======
   final String baseurl = BOT_BASE_URL;
   final String serverUrl = SERVER_BASE_URL;
 
->>>>>>> Stashed changes
   MessageRepository();
 
   Future<String> queryPrompt(String prompt) async {
