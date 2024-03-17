@@ -42,8 +42,6 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return KeyboardDismissOnTap(child: BlocBuilder<MessageCubit, MessageState>(
       builder: (context, state) {
-
-        
         if (state is MessageQueryLoaded) {
           cubit.isChatSelected();
         }

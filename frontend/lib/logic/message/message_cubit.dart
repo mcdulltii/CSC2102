@@ -9,11 +9,8 @@ part 'message_state.dart';
 
 class MessageCubit extends Cubit<MessageState> {
   final MessageRepository repo;
-
   List<Message> messages = [];
-
   bool isError = false;
-
   String currChatId = "";
 
   MessageCubit(this.repo) : super(MessageInitial());
@@ -49,7 +46,6 @@ class MessageCubit extends Cubit<MessageState> {
     emit(MessageQueryLoading());
     // clear previous chat messages
     messages = [];
-
     currChatId = chatId;
 
     try {
