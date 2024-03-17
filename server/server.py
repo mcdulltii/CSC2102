@@ -246,7 +246,7 @@ def delete_chat():
         return {"result": True, "message": "Chat deleted successfully"}, 200
     except Exception as e:
         print(e)
-        return {"result": False, "error": "Failed to create chat"}, 500
+        return {"result": False, "error": "Failed to delete chat"}, 500
 
 
 @app.route("/api/createMessage", methods=["POST"])
@@ -305,6 +305,26 @@ def get_message():
         message_list.append(message_data)
 
     return jsonify(message_list), 200
+
+
+@app.route("/api/deleteMessages", methods=["DELETE"])
+@cross_origin()
+def delete_messages():
+    global db
+    # Requires chat ID
+    chat_id = request.args.get("chatId")
+
+    if not chat_id:
+        return {"result": False, "error": "Chat ID is required"}, 400
+
+    chats_collection = db.chats
+
+    try:
+        chats_collection.delete_many({"chatId": ObjectId(chat_id)})
+        return {"result": True, "message": "Messages deleted successfully"}, 200
+    except Exception as e:
+        print(e)
+        return {"result": False, "error": "Failed to delete messages"}, 500
 
 
 def main() -> None:
