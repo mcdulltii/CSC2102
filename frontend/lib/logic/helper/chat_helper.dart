@@ -9,3 +9,8 @@ Future<String?> getChatIdFromLocalStorage() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getString('chat_id');
 }
+
+Future<void> removeChatIdFromLocalStorage() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('chat_id');
+}

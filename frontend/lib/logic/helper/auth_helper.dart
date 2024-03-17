@@ -1,3 +1,5 @@
+import 'package:frontend/logic/helper/chat_helper.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> saveUserIdToLocalStorage(String userId) async {
@@ -13,5 +15,5 @@ Future<String?> getUserIdFromLocalStorage() async {
 Future<void> removeIdsFromLocalStorage() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.remove('user_id');
-  await prefs.remove('chat_id');
+  await removeChatIdFromLocalStorage();
 }

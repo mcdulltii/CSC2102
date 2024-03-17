@@ -9,6 +9,8 @@ final class MessageQueryLoading extends MessageState {}
 
 final class MessageQueryLoaded extends MessageState {}
 
+final class MessagesEmpty extends MessageState {}
+
 final class MessageQueryResultError extends MessageState {
   final String message;
 

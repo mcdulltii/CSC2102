@@ -8,6 +8,7 @@ import 'package:frontend/logic/chat/chat_event.dart';
 import 'package:frontend/logic/chat/chat_state.dart';
 import 'package:frontend/logic/helper/auth_helper.dart';
 import 'package:frontend/logic/helper/chat_helper.dart';
+import 'package:frontend/logic/message/message_cubit.dart';
 import 'package:frontend/presentation/helpers/segment_chat_history.dart';
 
 class CustomNavigationDrawer extends StatefulWidget {
@@ -22,11 +23,13 @@ class CustomNavigationDrawer extends StatefulWidget {
 class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
   late String _userId;
   late final ChatBloc _chatBloc;
+  late final MessageCubit _messageCubit;
 
   @override
   void initState() {
     super.initState();
     _chatBloc = ChatBloc(RepositoryProvider.of<ChatRepository>(context));
+    _messageCubit = BlocProvider.of<MessageCubit>(context);
     _initialize();
   }
 
@@ -163,10 +166,15 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
             Expanded(
               child: TextButton(
                 onPressed: () async {
-                  await saveChatIdToLocalStorage(chat.id)
-                      .then((_) => Navigator.of(context).pop());
+                  await saveChatIdToLocalStorage(chat.id).then((_) {
+                    _messageCubit.getMessagesByChatId(chat.id);
+                    Navigator.of(context).pop();
+                  });
                 },
-                child: Text(chat.title),
+                child: Text(
+                  chat.title,
+                  style: const TextStyle(fontSize: 16),
+                ),
               ),
             ),
           IconButton(
@@ -177,8 +185,16 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
           ),
           const SizedBox(width: 1),
           IconButton(
-            onPressed: () {
-              _chatBloc.add(ChatDeleted(chat.id));
+            onPressed: () async {
+              await getChatIdFromLocalStorage().then((chatId) {
+                if (chatId == chat.id) {
+                  removeChatIdFromLocalStorage();
+                }
+                _chatBloc.add(ChatDeleted(chat.id));
+                _messageCubit.deleteMessagesByChatId(chat.id);
+                // TODO: Keep on same chat after deleting other chats that is not currently opened
+                // _messageCubit.getMessagesByChatId(chat.id);
+              });
             },
             icon: const Icon(Icons.delete),
           ),

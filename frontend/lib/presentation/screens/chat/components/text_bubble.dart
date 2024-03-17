@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:animated_text_kit/animated_text_kit.dart';
-
 class TextBubble extends StatelessWidget {
   final String text;
   final bool isBot;
@@ -15,19 +13,7 @@ class TextBubble extends StatelessWidget {
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: isBot
-            ? AnimatedTextKit(
-                isRepeatingAnimation: false,
-                totalRepeatCount: 1,
-                animatedTexts: [
-                  TyperAnimatedText(
-                    text,
-                    textStyle: const TextStyle(fontSize: 16),
-                    speed: const Duration(milliseconds: 20),
-                  ),
-                ],
-              )
-            : Text(text),
+        child: Text(text),
       ),
     );
   }

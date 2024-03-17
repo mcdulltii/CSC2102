@@ -27,11 +27,13 @@ class _ChatPageState extends State<ChatPage> {
   late MessageCubit cubit;
   late AuthCubit authCubit;
 
+  bool isChatExists = false;
+
   TextEditingController editingController = TextEditingController();
 
   @override
   void initState() {
-    cubit = BlocProvider.of<MessageCubit>(context);
+    cubit = BlocProvider.of<MessageCubit>(context)..isChatSelected();
     authCubit = BlocProvider.of<AuthCubit>(context);
     super.initState();
   }
@@ -40,6 +42,10 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return KeyboardDismissOnTap(child: BlocBuilder<MessageCubit, MessageState>(
       builder: (context, state) {
+        if (state is MessageQueryLoaded) {
+          cubit.isChatSelected();
+        }
+
         return Scaffold(
           appBar: AppBar(
             title: const Text(
@@ -51,67 +57,73 @@ class _ChatPageState extends State<ChatPage> {
             signoutCallback: () {
               // authCubit.signout;
               removeIdsFromLocalStorage();
+              cubit.removeAllMessage();
               navigateWithFadeTransition(context, const WelcomePage());
             },
           ),
-          body: Column(
-            children: [
-              // SizedBox(
-              //   width: 300,
-              //   height: 300,
-              //   child: Image.asset("assets/robot.gif", fit: BoxFit.cover),
-              // ),
-              Expanded(
-                child: GroupedListView(
-                  padding: const EdgeInsets.all(10),
-                  reverse: true,
-                  order: GroupedListOrder.DESC,
-                  useStickyGroupSeparators: true,
-                  floatingHeader: true,
-                  elements: cubit.messages,
-                  groupBy: (message) => DateTime(message.timestamp.year,
-                      message.timestamp.month, message.timestamp.day),
-                  groupHeaderBuilder: (Message message) => SizedBox(
-                    height: 40,
-                    child: Center(
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Text(
-                            DateFormat.yMMMd().format(message.timestamp),
+          body: state is MessagesEmpty
+              ? const Center(
+                  child: Text("Please select a chat"),
+                )
+              : Column(
+                  children: [
+                    // SizedBox(
+                    //   width: 300,
+                    //   height: 300,
+                    //   child: Image.asset("assets/robot.gif", fit: BoxFit.cover),
+                    // ),
+
+                    Expanded(
+                      child: GroupedListView(
+                        padding: const EdgeInsets.all(10),
+                        reverse: true,
+                        order: GroupedListOrder.DESC,
+                        useStickyGroupSeparators: true,
+                        floatingHeader: true,
+                        elements: cubit.messages,
+                        groupBy: (message) => DateTime(message.timestamp.year,
+                            message.timestamp.month, message.timestamp.day),
+                        groupHeaderBuilder: (Message message) => SizedBox(
+                          height: 40,
+                          child: Center(
+                            child: Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: Text(
+                                  DateFormat.yMMMd().format(message.timestamp),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        itemBuilder: (context, Message message) => Align(
+                          alignment: message.isBot
+                              ? Alignment.centerLeft
+                              : Alignment.centerRight,
+                          child: TextBubble(
+                            isBot: message.isBot,
+                            text: message.payload,
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  itemBuilder: (context, Message message) => Align(
-                    alignment: message.isBot
-                        ? Alignment.centerLeft
-                        : Alignment.centerRight,
-                    child: TextBubble(
-                      isBot: message.isBot,
-                      text: message.payload,
+                    Center(
+                      child: state is MessageQueryLoading
+                          ? const SpinKitThreeBounce(
+                              color: Colors.blue,
+                              size: 20.0,
+                            )
+                          : null,
                     ),
-                  ),
+                    TypeBar(
+                      editingController: editingController,
+                      submitCallback: () {
+                        cubit.sendQuery(editingController.text);
+                        editingController.clear();
+                      },
+                    )
+                  ],
                 ),
-              ),
-              Center(
-                child: state is MessageQueryLoading
-                    ? const SpinKitThreeBounce(
-                        color: Colors.blue,
-                        size: 20.0,
-                      )
-                    : null,
-              ),
-              TypeBar(
-                editingController: editingController,
-                submitCallback: () {
-                  cubit.sendQuery(editingController.text);
-                  editingController.clear();
-                },
-              )
-            ],
-          ),
         );
       },
     ));
