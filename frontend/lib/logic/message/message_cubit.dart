@@ -14,6 +14,8 @@ class MessageCubit extends Cubit<MessageState> {
 
   bool isError = false;
 
+  String currChatId = "";
+
   MessageCubit(this.repo) : super(MessageInitial());
 
   Future<void> sendQuery(String text) async {
@@ -48,6 +50,8 @@ class MessageCubit extends Cubit<MessageState> {
     // clear previous chat messages
     messages = [];
 
+    currChatId = chatId;
+
     try {
       final fetchedMessages = await repo.getAllChatsByChatId(chatId);
       messages = fetchedMessages;
@@ -59,9 +63,8 @@ class MessageCubit extends Cubit<MessageState> {
 
   Future<void> deleteMessagesByChatId(String chatId) async {
     // call repo to backend to delete messages
-    repo.deleteAllChatsByChatId(chatId);
-    messages = [];
-    emit(MessageQueryLoaded());
+    await repo.deleteAllChatsByChatId(chatId);
+    await getMessagesByChatId(currChatId);
   }
 
   Future<void> isChatSelected() async {

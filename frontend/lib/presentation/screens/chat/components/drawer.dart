@@ -168,7 +168,7 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
                 onPressed: () async {
                   await saveChatIdToLocalStorage(chat.id).then((_) {
                     _messageCubit.getMessagesByChatId(chat.id);
-                    Navigator.of(context).pop();
+                    Navigator.pop(context);
                   });
                 },
                 child: Text(
