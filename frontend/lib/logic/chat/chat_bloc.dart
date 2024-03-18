@@ -6,7 +6,6 @@ import 'package:frontend/logic/chat/chat_state.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final ChatRepository _chatRepository;
-  
 
   ChatBloc(this._chatRepository) : super(ChatInitial()) {
     on<ChatRetrieved>((event, emit) async {

@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 
 import 'package:frontend/data/model/message.dart';
 import 'package:frontend/data/repository/chat/message_repository.dart';
+import 'package:frontend/logic/helper/chat_helper.dart';
 
 part 'message_state.dart';
 
 class MessageCubit extends Cubit<MessageState> {
   final MessageRepository repo;
-
   List<Message> messages = [];
-
   bool isError = false;
+  String currChatId = "";
 
   MessageCubit(this.repo) : super(MessageInitial());
 
@@ -19,14 +19,13 @@ class MessageCubit extends Cubit<MessageState> {
     final userMessage =
         Message(isBot: false, timestamp: DateTime.now(), payload: text);
 
-    // save user Message
-    // repo.createMessage(chatId, isBot, payload, timestamp)
-
+    final chatId = await getChatIdFromLocalStorage();
+    repo.createMessage(chatId!, false, text, DateTime.now());
     messages.add(userMessage);
     emit(MessageQueryLoading());
+
     try {
       final result = await repo.queryPrompt(text);
-
       _checkError(result);
 
       final botMessage = Message(
@@ -34,15 +33,43 @@ class MessageCubit extends Cubit<MessageState> {
         timestamp: DateTime.now(),
         payload: result,
       );
-
       messages.add(botMessage);
-
-      // save bot Message
-      // repo.createMessage(chatId, isBot, payload, timestamp)
+      repo.createMessage(chatId, true, result, DateTime.now());
 
       emit(MessageQueryLoaded());
     } catch (e) {
       emit(MessageQueryResultError(message: e.toString()));
+    }
+  }
+
+  Future<void> getMessagesByChatId(String chatId) async {
+    emit(MessageQueryLoading());
+    // clear previous chat messages
+    messages = [];
+    currChatId = chatId;
+
+    try {
+      final fetchedMessages = await repo.getAllChatsByChatId(chatId);
+      messages = fetchedMessages;
+      emit(MessageQueryLoaded());
+    } catch (e) {
+      emit(MessageQueryResultError(message: e.toString()));
+    }
+  }
+
+  Future<void> deleteMessagesByChatId(String chatId) async {
+    // call repo to backend to delete messages
+    await repo.deleteAllChatsByChatId(chatId);
+    await getMessagesByChatId(currChatId);
+  }
+
+  Future<void> isChatSelected() async {
+    final chatId = await getChatIdFromLocalStorage();
+
+    if (chatId == null) {
+      emit(MessagesEmpty());
+    } else {
+      emit(MessageQueryLoaded());
     }
   }
 
@@ -54,5 +81,9 @@ class MessageCubit extends Cubit<MessageState> {
     } else {
       isError = false;
     }
+  }
+
+  void removeAllMessage() {
+    messages = [];
   }
 }

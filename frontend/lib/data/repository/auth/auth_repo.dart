@@ -35,10 +35,6 @@ class AuthRepository {
           final userId = responseData['user_id'];
           await saveUserIdToLocalStorage(
               userId); // Save user_id to local storage
-
-          String? userID = await getUserIdFromLocalStorage();
-          // Use the userId
-          print(userID);
         } else {
           throw Exception('Login failed: ${responseData['message']}');
         }

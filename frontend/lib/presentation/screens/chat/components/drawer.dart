@@ -7,6 +7,8 @@ import 'package:frontend/logic/chat/chat_bloc.dart';
 import 'package:frontend/logic/chat/chat_event.dart';
 import 'package:frontend/logic/chat/chat_state.dart';
 import 'package:frontend/logic/helper/auth_helper.dart';
+import 'package:frontend/logic/helper/chat_helper.dart';
+import 'package:frontend/logic/message/message_cubit.dart';
 import 'package:frontend/presentation/helpers/segment_chat_history.dart';
 
 class CustomNavigationDrawer extends StatefulWidget {
@@ -21,11 +23,13 @@ class CustomNavigationDrawer extends StatefulWidget {
 class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
   late String _userId;
   late final ChatBloc _chatBloc;
+  late final MessageCubit _messageCubit;
 
   @override
   void initState() {
     super.initState();
     _chatBloc = ChatBloc(RepositoryProvider.of<ChatRepository>(context));
+    _messageCubit = BlocProvider.of<MessageCubit>(context);
     _initialize();
   }
 
@@ -88,7 +92,8 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
         bloc: _chatBloc,
         builder: (context, state) {
           if (state is ChatLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Expanded(
+                child: Center(child: CircularProgressIndicator()));
           } else if (state is ChatLoaded) {
             final chats = state.chats;
             final formatChat = segmentChatHistory(chats);
@@ -119,7 +124,7 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: chats.length,
                               itemBuilder: (context, index) =>
-                                  getRow(state, chats[index]),
+                                  getRow(context, state, chats[index]),
                             ),
                           ],
                         )
@@ -131,31 +136,46 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
             // reload the list of chats
             _chatBloc.add(ChatRetrieved("", _userId));
           } else if (state is ChatError) {
-            return Center(child: Text(state.errorMessage));
+            return Expanded(child: Center(child: Text(state.errorMessage)));
           } else {
-            return Container();
+            return Expanded(child: Container());
           }
 
-          return Container();
+          return Expanded(child: Container());
         },
       );
 
-  Widget getRow(ChatState state, Chat chat) {
+  Widget getRow(BuildContext context, ChatState state, Chat chat) {
     return ListTile(
       title: Row(
         children: [
           if (state is ChatLoaded && state.id == chat.id)
             Expanded(
               child: TextField(
+                autofocus: true,
                 controller: TextEditingController(text: chat.title),
                 onSubmitted: (newTitle) {
                   _chatBloc.add(ChatUpdated(chat.copyWith(title: newTitle)));
+                },
+                onTapOutside: (_) {
+                  _chatBloc.add(ChatRetrieved("", _userId));
                 },
               ),
             )
           else
             Expanded(
-              child: Text(chat.title),
+              child: TextButton(
+                onPressed: () async {
+                  await saveChatIdToLocalStorage(chat.id).then((_) {
+                    _messageCubit.getMessagesByChatId(chat.id);
+                    Navigator.pop(context);
+                  });
+                },
+                child: Text(
+                  chat.title,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
             ),
           IconButton(
             onPressed: () {
@@ -165,8 +185,16 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
           ),
           const SizedBox(width: 1),
           IconButton(
-            onPressed: () {
-              _chatBloc.add(ChatDeleted(chat.id));
+            onPressed: () async {
+              await getChatIdFromLocalStorage().then((chatId) {
+                if (chatId == chat.id) {
+                  removeChatIdFromLocalStorage();
+                }
+                _chatBloc.add(ChatDeleted(chat.id));
+                _messageCubit.deleteMessagesByChatId(chat.id);
+                // TODO: Keep on same chat after deleting other chats that is not currently opened
+                // _messageCubit.getMessagesByChatId(chat.id);
+              });
             },
             icon: const Icon(Icons.delete),
           ),
