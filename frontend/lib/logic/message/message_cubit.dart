@@ -15,6 +15,7 @@ class MessageCubit extends Cubit<MessageState> {
   bool isError = false;
 
   String currChatId = "";
+  String botLastMessage = "";
 
   MessageCubit(this.repo) : super(MessageInitial());
 
@@ -36,10 +37,13 @@ class MessageCubit extends Cubit<MessageState> {
         timestamp: DateTime.now(),
         payload: result,
       );
+
+      botLastMessage = result;
+
       messages.add(botMessage);
       repo.createMessage(chatId, true, result, DateTime.now());
 
-      emit(MessageQueryLoaded());
+      emit(MessageQueryLoaded(text: result));
     } catch (e) {
       emit(MessageQueryResultError(message: e.toString()));
     }
@@ -55,6 +59,7 @@ class MessageCubit extends Cubit<MessageState> {
     try {
       final fetchedMessages = await repo.getAllChatsByChatId(chatId);
       messages = fetchedMessages;
+      botLastMessage = messages.last.payload;
       emit(MessageQueryLoaded());
     } catch (e) {
       emit(MessageQueryResultError(message: e.toString()));

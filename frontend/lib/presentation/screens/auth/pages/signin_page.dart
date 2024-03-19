@@ -5,6 +5,7 @@ import 'package:frontend/logic/auth/auth_cubit.dart';
 import 'package:frontend/presentation/helpers/navigate_with_transition.dart';
 import 'package:frontend/presentation/screens/auth/components/custom_scaffold.dart';
 import 'package:frontend/presentation/screens/auth/pages/signup_page.dart';
+import 'package:frontend/presentation/screens/chat/pages/animation_page.dart';
 import 'package:frontend/presentation/screens/chat/pages/chat_page.dart';
 import 'package:frontend/presentation/theme/theme.dart';
 
@@ -35,7 +36,7 @@ class _SignInPageState extends State<SignInPage> {
               duration: Duration(milliseconds: 500), // Shorten duration
             ),
           );
-          navigateWithFadeTransition(context, const ChatPage());
+          navigateWithFadeTransition(context, const AnimationPage());
         } else if (state is AuthFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:frontend/presentation/screens/auth/pages/welcome_page.dart';
+import 'package:frontend/presentation/screens/chat/pages/animation_page.dart';
 import 'package:frontend/presentation/screens/chat/pages/chat_page.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,7 +23,7 @@ class StarterPage extends StatelessWidget {
         } else {
           // If userId exists in SharedPreferences, navigate to ChatPage
           if (snapshot.data == true) {
-            return const ChatPage();
+            return const AnimationPage();
           } else {
             // If userId doesn't exist in SharedPreferences, navigate to WelcomePage
             return const WelcomePage();

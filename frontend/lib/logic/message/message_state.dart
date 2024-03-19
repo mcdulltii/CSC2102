@@ -7,7 +7,11 @@ final class MessageInitial extends MessageState {}
 
 final class MessageQueryLoading extends MessageState {}
 
-final class MessageQueryLoaded extends MessageState {}
+final class MessageQueryLoaded extends MessageState {
+  String text;
+
+  MessageQueryLoaded({this.text = ""});
+}
 
 final class MessagesEmpty extends MessageState {}
 

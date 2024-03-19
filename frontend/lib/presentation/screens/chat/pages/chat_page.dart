@@ -17,7 +17,9 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key});
+  final TextEditingController editingController;
+
+  const ChatPage({super.key, required this.editingController});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -29,7 +31,7 @@ class _ChatPageState extends State<ChatPage> {
 
   bool isChatExists = false;
 
-  TextEditingController editingController = TextEditingController();
+  // TextEditingController editingController = TextEditingController();
 
   @override
   void initState() {
@@ -50,18 +52,11 @@ class _ChatPageState extends State<ChatPage> {
 
         return Scaffold(
           appBar: AppBar(
+            leading: const BackButton(),
             title: const Text(
               "Dr. Bot",
               style: TextStyle(fontSize: 26),
             ),
-          ),
-          drawer: CustomNavigationDrawer(
-            signoutCallback: () {
-              // authCubit.signout;
-              removeIdsFromLocalStorage();
-              cubit.removeAllMessage();
-              navigateWithFadeTransition(context, const WelcomePage());
-            },
           ),
           body: state is MessagesEmpty
               ? const Center(
@@ -69,12 +64,6 @@ class _ChatPageState extends State<ChatPage> {
                 )
               : Column(
                   children: [
-                    // SizedBox(
-                    //   width: 300,
-                    //   height: 300,
-                    //   child: Image.asset("assets/robot.gif", fit: BoxFit.cover),
-                    // ),
-
                     Expanded(
                       child: GroupedListView(
                         padding: const EdgeInsets.all(10),
@@ -118,10 +107,10 @@ class _ChatPageState extends State<ChatPage> {
                           : null,
                     ),
                     TypeBar(
-                      editingController: editingController,
+                      editingController: widget.editingController,
                       submitCallback: () {
-                        cubit.sendQuery(editingController.text);
-                        editingController.clear();
+                        cubit.sendQuery(widget.editingController.text);
+                        widget.editingController.clear();
                       },
                     )
                   ],
