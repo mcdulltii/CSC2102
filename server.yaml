@@ -24,7 +24,6 @@ metadata:
   name: cloud
   namespace: psd2
 spec:
-  replicas: 3
   selector:
     matchLabels:
       app: cloud
@@ -43,4 +42,32 @@ spec:
             - containerPort: 8000
           resources: {}
       restartPolicy: Always
+status: {}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: cloud-hpa
+  namespace: psd2
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: cloud
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+    - type: Pods
+      pods:
+        metric:
+          name: packets-per-second
+        target:
+          type: AverageValue
+          averageValue: 1k
 status: {}
