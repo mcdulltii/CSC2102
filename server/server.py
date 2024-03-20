@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from pymongo import MongoClient, errors
 from bson import json_util
 from bson.objectid import ObjectId
+import requests
 import mysql.connector
 import re
 import uuid
@@ -325,6 +326,20 @@ def delete_messages():
     except Exception as e:
         print(e)
         return {"result": False, "error": "Failed to delete messages"}, 500
+
+
+@app.route("/api/llm", methods=["POST"])
+@cross_origin()
+def llm():
+    data = request.get_data()
+    endpoint = "http://animaserver.duckdns.org:8080/api/getModelInf"
+
+    try: 
+        response = requests.post(endpoint, data=data, timeout=30)
+        return response.json(), 200
+    except Exception as e:
+        # Handle other request errors
+        return jsonify({"error": str(e)}), 500
 
 
 def main() -> None:
