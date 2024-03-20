@@ -26,8 +26,8 @@ services:
     ulimits:
       nproc: 65535
       nofile:
-        soft: 200000
-        hard: 200000
+        soft: 210000
+        hard: 210000
     volumes:
       - ./docker/haproxy:/usr/local/etc/haproxy
     networks:

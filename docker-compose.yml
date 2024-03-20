@@ -77,8 +77,6 @@ services:
     build: llm
     container_name: llm
     restart: always
-    ports:
-      - 8080:8080
     volumes:
       - ./uvicorn_data:/server/data
     deploy:
@@ -90,6 +88,23 @@ services:
               capabilities: [gpu]
     networks:
       - app_network
+
+  haproxy:
+    image: haproxy:2.8.7
+    container_name: haproxy
+    restart: always
+    ports:
+      - 8080:8080
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 210000
+        hard: 210000
+    volumes:
+      - ./docker/haproxy:/usr/local/etc/haproxy
+    networks:
+      - app_network
+
 
 networks:
   app_network:
