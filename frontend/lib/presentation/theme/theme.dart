@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // Colors
-  static const Color primaryColor = Color(0xFF18604A);
+  static const Color primaryColor = Color.fromARGB(255, 20, 121, 121);
+  static const Color appBarColor = Color.fromARGB(255, 242, 242, 242);
   static const Color greyColor = Color(0xFF626262);
+  static const Color blackColor = Color.fromARGB(255, 0, 0, 0);
   static const Color sendRequestColor = Color(0xFFE6D6C6);
   static const Color hintTextColor = Color(0xFF969696);
   static const Color secondaryColor = Color(0xFFD9E9E6);

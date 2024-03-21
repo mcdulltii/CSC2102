@@ -12,6 +12,7 @@ import 'package:frontend/presentation/screens/auth/pages/welcome_page.dart';
 import 'package:frontend/presentation/screens/chat/components/drawer.dart';
 import 'package:frontend/presentation/screens/chat/components/text_bubble.dart';
 import 'package:frontend/presentation/screens/chat/components/type_bar.dart';
+import 'package:frontend/presentation/theme/theme.dart';
 
 import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
@@ -52,10 +53,13 @@ class _ChatPageState extends State<ChatPage> {
 
         return Scaffold(
           appBar: AppBar(
+            backgroundColor: AppTheme.appBarColor,
             leading: const BackButton(),
-            title: const Text(
-              "Dr. Bot",
-              style: TextStyle(fontSize: 26),
+            title: const Center(
+              child: Text(
+                "Dr. Natasha",
+                style: TextStyle(fontSize: 26),
+              ),
             ),
           ),
           body: state is MessagesEmpty

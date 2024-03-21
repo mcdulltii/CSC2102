@@ -59,7 +59,7 @@ class MessageCubit extends Cubit<MessageState> {
     try {
       final fetchedMessages = await repo.getAllChatsByChatId(chatId);
       messages = fetchedMessages;
-      botLastMessage = messages.last.payload;
+      botLastMessage = messages.last.payload.trim();
       emit(MessageQueryLoaded());
     } catch (e) {
       emit(MessageQueryResultError(message: e.toString()));
