@@ -334,9 +334,9 @@ def llm():
     data = request.get_data()
     endpoint = "http://animaserver.duckdns.org:8080/api/getModelInf"
 
-    try: 
+    try:
         response = requests.post(endpoint, data=data, timeout=30)
-        return response.json(), 200
+        return jsonify(response.json()), 200
     except Exception as e:
         # Handle other request errors
         return jsonify({"error": str(e)}), 500
