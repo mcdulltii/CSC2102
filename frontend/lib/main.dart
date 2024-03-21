@@ -43,8 +43,8 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             useMaterial3: true,
           ),
-          home: AnimationPage(),
-          // home: const SignInPage(),
+          // home: AnimationPage(),
+          home: const SignInPage(),
         ),
       ),
     );
