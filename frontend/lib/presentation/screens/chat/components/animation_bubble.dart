@@ -13,7 +13,7 @@ class AnimationBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String truncatedText = _truncateText(text, 15);
+    String truncatedText = _truncateText(text.trim(), 15);
     return GestureDetector(
       onTap: () => callback(),
       child: Container(
@@ -34,7 +34,7 @@ class AnimationBubble extends StatelessWidget {
                 fontSize: 16,
               ),
               textAlign: TextAlign.start,
-              speed: const Duration(milliseconds: 50),
+              speed: const Duration(milliseconds: 40),
             ),
           ],
           isRepeatingAnimation: false,

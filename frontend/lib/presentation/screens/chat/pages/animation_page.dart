@@ -32,28 +32,13 @@ class _AnimationPageState extends State<AnimationPage> {
   late TTSManager ttsCubit = TTSManager();
 
   bool isChatExists = false;
+  bool isSpeaking = false;
 
   @override
   void initState() {
     cubit = BlocProvider.of<MessageCubit>(context)..isChatSelected();
     authCubit = BlocProvider.of<AuthCubit>(context);
     super.initState();
-    // Set callbacks for TTS events
-    ttsCubit.setOnStartCallback(() {
-      setState(() {
-        // Update UI as needed
-      });
-    });
-    ttsCubit.setOnCompleteCallback(() {
-      setState(() {
-        // Update UI as needed
-      });
-    });
-    ttsCubit.setOnErrorCallback(() {
-      setState(() {
-        // Update UI as needed
-      });
-    });
   }
 
   @override
@@ -103,54 +88,46 @@ class _AnimationPageState extends State<AnimationPage> {
                   child: GestureDetector(
                     onTap: () {
                       if (cubit.botLastMessage.isNotEmpty) {
-                        ttsCubit.toggleSpeak();
+                        
+                        setState(() {
+                          if((state as MessageQueryLoaded).isSpeaking){
+                            state.isSpeaking=false;
+                          }else{
+                            state.isSpeaking=true;
+                          }
+                          ttsCubit.setIsSpeaking(state.isSpeaking);
+                        });
                         ttsCubit.speak(cubit
-                            .botLastMessage); // Speak botLastMessage if not muted
+                            .botLastMessage);
                       }
-                      setState(() {});
                     },
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width,
                       child: Image.asset(
-                        ttsCubit.isSpeaking()
-                            ? "assets/doctor_talking.gif"
-                            : "assets/doctor.jpg",
+                        state is MessageQueryLoaded && state.isSpeaking
+                          ? "assets/doctor_talking.gif"
+                          : "assets/doctor.png",
                         fit: BoxFit.contain,
                       ),
                     ),
                   ),
                 ),
-                // Expanded(
-                //   flex: 1,
-                //   child: Align(
-                //     alignment: Alignment.topCenter,
-                //     child: Padding(
-                //       padding: const EdgeInsets.only(
-                //           top: 8.0), // Adjust the top padding as needed
-                //       child: Text(
-                //         cubit.botLastMessage.isNotEmpty
-                //             ? "Tap on me!"
-                //             : "How may I help you?",
-                //         style: const TextStyle(
-                //           fontSize: 25,
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // ),
                 Center(
-                  child: (state is MessageQueryLoaded && state.text != "") ||
-                          cubit.botLastMessage != ""
-                      ? AnimationBubble(
-                          text: cubit.botLastMessage,
-                          callback: () {
-                            navigateWithFadeTransition(
-                              context,
-                              ChatPage(
-                                editingController: editingController,
-                              ),
-                            );
-                          },
+                  child: (state is MessageQueryLoaded)
+                      ? Container(
+                          child: cubit.botLastMessage == ""
+                              ? null
+                              : AnimationBubble(
+                                  text: state.text,
+                                  callback: () {
+                                    navigateWithFadeTransition(
+                                      context,
+                                      ChatPage(
+                                        editingController: editingController,
+                                      ),
+                                    );
+                                  },
+                                ),
                         )
                       : null,
                 ),

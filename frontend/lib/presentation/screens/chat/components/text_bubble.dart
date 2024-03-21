@@ -15,7 +15,7 @@ class TextBubble extends StatelessWidget {
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: Text(text,
+        child: Text(text.trim(),
         style: TextStyle(color: isBot? AppTheme.whiteBackgroundColor: AppTheme.blackColor)),
       ),
     );

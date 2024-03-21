@@ -18,7 +18,7 @@ class MessageRepository {
     try {
       final response = await http
           .post(
-            Uri.parse('$BOT_BASE_URL/api/getModelInf'),
+            Uri.parse('$BOT_BASE_URL/api/llm'),
             headers: {
               HttpHeaders.contentTypeHeader: 'application/json',
               // TO DO: IMPLEMENT AFTER DATABASE IS SET-UP
@@ -26,7 +26,7 @@ class MessageRepository {
             },
             body: jsonEncode({'prompt': prompt}),
           )
-          .timeout(const Duration(seconds: 15)); // Set the timeout to 5 seconds
+          .timeout(const Duration(seconds: 30)); // Set the timeout to 15 seconds
 
       String returnPrompt = jsonDecode(response.body);
       return returnPrompt;

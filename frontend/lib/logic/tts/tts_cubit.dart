@@ -68,4 +68,10 @@ class TTSManager {
   bool isSpeaking() {
     return _isSpeaking;
   }
+  void setIsSpeaking(bool value){
+    _isSpeaking=value;
+    if (!_isSpeaking) {
+      flutterTts.stop();
+    }
+  }
 }
