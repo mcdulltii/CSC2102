@@ -21,15 +21,12 @@ class MessageRepository {
             Uri.parse('$BOT_BASE_URL/api/llm'),
             headers: {
               HttpHeaders.contentTypeHeader: 'application/json',
-              // TO DO: IMPLEMENT AFTER DATABASE IS SET-UP
-              // HttpHeaders.authorizationHeader: 'Basic $base64Encode(utf8.encode('$username:$password'))',
             },
             body: jsonEncode({'prompt': prompt}),
           )
-          .timeout(const Duration(seconds: 30)); // Set the timeout to 15 seconds
+          .timeout(const Duration(seconds: 15));
 
-      String returnPrompt = jsonDecode(response.body);
-      return returnPrompt;
+      return jsonDecode(response.body);
     } on TimeoutException {
       return "The request timed out. Please try again.";
     } catch (e) {
@@ -53,12 +50,8 @@ class MessageRepository {
               'timestamp': timestamp.toIso8601String(),
             }),
           )
-          .timeout(const Duration(seconds: 15)); // Set the timeout to 5 seconds
+          .timeout(const Duration(seconds: 15));
 
-      print(response.statusCode);
-
-      // Handle response based on status code or body content
-      // For example:
       if (response.statusCode == 200) {
         return "Message created successfully.";
       } else {
@@ -73,9 +66,8 @@ class MessageRepository {
 
   Future<void> deleteAllChatsByChatId(String chatId) async {
     try {
-      // Initialize Dio instance
       Dio dio = Dio();
-      // Make HTTP request to fetch data
+
       Response response =
           await dio.delete('$serverUrl/api/deleteMessages?chatId=$chatId');
 
@@ -90,15 +82,12 @@ class MessageRepository {
 
   Future<List<Message>> getAllChatsByChatId(String chatId) async {
     try {
+      Dio dio = Dio();
       List<Message> messages = [];
 
-      // Initialize Dio instance
-      Dio dio = Dio();
-      // Make HTTP request to fetch data
       Response response =
           await dio.get('$serverUrl/api/getMessages?chatId=$chatId');
 
-      // Parse response data into list of Message objects
       List<dynamic> responseData = response.data;
       for (var data in responseData) {
         messages.add(Message(
@@ -111,9 +100,7 @@ class MessageRepository {
 
       return messages;
     } catch (e) {
-      // Handle errors here
-      print('Error fetching chats: $e');
-      return []; // Return empty list if error occurs
+      throw Exception("Error fetching chats: $e");
     }
   }
 }

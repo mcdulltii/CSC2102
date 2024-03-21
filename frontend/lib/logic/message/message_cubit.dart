@@ -10,11 +10,8 @@ part 'message_state.dart';
 class MessageCubit extends Cubit<MessageState> {
   final MessageRepository repo;
   late TTSManager ttsCubit = TTSManager();
-
   List<Message> messages = [];
-  
   bool isError = false;
-
   String currChatId = "";
   String botLastMessage = "";
 
@@ -56,7 +53,6 @@ class MessageCubit extends Cubit<MessageState> {
     emit(MessageQueryLoading());
     // clear previous chat messages
     messages = [];
-
     currChatId = chatId;
 
     try {
