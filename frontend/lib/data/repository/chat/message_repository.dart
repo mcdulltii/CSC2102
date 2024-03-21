@@ -18,7 +18,7 @@ class MessageRepository {
     try {
       final response = await http
           .post(
-            Uri.parse('$BOT_BASE_URL/api/getModelInf'),
+            Uri.parse('$BOT_BASE_URL/api/llm'),
             headers: {
               HttpHeaders.contentTypeHeader: 'application/json',
             },

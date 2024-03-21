@@ -1,17 +1,19 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-
+import 'package:frontend/logic/tts/tts_cubit.dart';
 import 'package:frontend/data/model/message.dart';
 import 'package:frontend/data/repository/chat/message_repository.dart';
 import 'package:frontend/logic/helper/chat_helper.dart';
-
+import 'package:frontend/presentation/screens/chat/pages/animation_page.dart';
 part 'message_state.dart';
 
 class MessageCubit extends Cubit<MessageState> {
   final MessageRepository repo;
+  late TTSManager ttsCubit = TTSManager();
   List<Message> messages = [];
   bool isError = false;
   String currChatId = "";
+  String botLastMessage = "";
 
   MessageCubit(this.repo) : super(MessageInitial());
 
@@ -33,10 +35,15 @@ class MessageCubit extends Cubit<MessageState> {
         timestamp: DateTime.now(),
         payload: result,
       );
-      messages.add(botMessage);
-      repo.createMessage(chatId, true, result, DateTime.now());
 
-      emit(MessageQueryLoaded());
+      botLastMessage = result;
+
+      //Myfunction
+      ttsCubit.setIsSpeaking(true);
+      ttsCubit.speak(botLastMessage);
+
+      repo.createMessage(chatId, true, result, DateTime.now());
+      emit(MessageQueryLoaded(text: result, isSpeaking: true));
     } catch (e) {
       emit(MessageQueryResultError(message: e.toString()));
     }
@@ -51,7 +58,8 @@ class MessageCubit extends Cubit<MessageState> {
     try {
       final fetchedMessages = await repo.getAllChatsByChatId(chatId);
       messages = fetchedMessages;
-      emit(MessageQueryLoaded());
+      botLastMessage = messages.last.payload.trim();
+      emit(MessageQueryLoaded(text: botLastMessage));
     } catch (e) {
       emit(MessageQueryResultError(message: e.toString()));
     }
@@ -69,7 +77,7 @@ class MessageCubit extends Cubit<MessageState> {
     if (chatId == null) {
       emit(MessagesEmpty());
     } else {
-      emit(MessageQueryLoaded());
+      emit(MessageQueryLoaded(text: botLastMessage));
     }
   }
 

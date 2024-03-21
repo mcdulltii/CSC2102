@@ -7,6 +7,8 @@ import 'package:frontend/logic/message/message_cubit.dart';
 import 'package:frontend/presentation/navigation/starter_screen.dart';
 import 'package:frontend/data/repository/chat/chat_repository.dart';
 import 'package:frontend/data/repository/chat/message_repository.dart';
+import 'package:frontend/presentation/screens/auth/pages/signin_page.dart';
+import 'package:frontend/presentation/screens/chat/pages/animation_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,7 +43,8 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             useMaterial3: true,
           ),
-          home: const StarterPage(),
+          // home: AnimationPage(),
+          home: const SignInPage(),
         ),
       ),
     );
