@@ -3,6 +3,7 @@ import 'package:frontend/logic/tts/tts_cubit.dart';
 import 'package:frontend/data/model/message.dart';
 import 'package:frontend/data/repository/chat/message_repository.dart';
 import 'package:frontend/logic/helper/chat_helper.dart';
+
 part 'message_state.dart';
 
 class MessageCubit extends Cubit<MessageState> {
@@ -54,8 +55,6 @@ class MessageCubit extends Cubit<MessageState> {
     }
   }
 
-
-
   Future<void> getMessagesByChatId() async {
     emit(MessageQueryLoading());
     // clear previous chat messages
@@ -76,12 +75,15 @@ class MessageCubit extends Cubit<MessageState> {
     // call repo to backend to delete messages
     await repo.deleteAllChatsByChatId(chatId);
     await getMessagesByChatId();
+
+    isChatSelected();
   }
 
   Future<void> isChatSelected() async {
     final chatId = await getChatIdFromLocalStorage();
 
     if (chatId == null) {
+      print('isChatSelected: MessagesEmtpy');
       emit(MessagesEmpty());
     } else {
       emit(MessageQueryLoaded(text: botLastMessage));
