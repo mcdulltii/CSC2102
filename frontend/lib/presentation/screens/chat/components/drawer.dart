@@ -167,7 +167,7 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
               child: TextButton(
                 onPressed: () async {
                   await saveChatIdToLocalStorage(chat.id).then((_) {
-                    _messageCubit.getMessagesByChatId(chat.id);
+                    _messageCubit.updateChatId(chat.id);
                     Navigator.pop(context);
                   });
                 },

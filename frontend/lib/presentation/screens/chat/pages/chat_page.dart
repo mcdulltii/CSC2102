@@ -37,6 +37,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     cubit = BlocProvider.of<MessageCubit>(context)..isChatSelected();
+    cubit.getMessagesByChatId();
     authCubit = BlocProvider.of<AuthCubit>(context);
     super.initState();
   }
