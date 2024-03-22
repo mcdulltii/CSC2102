@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:frontend/presentation/screens/auth/pages/welcome_page.dart';
 import 'package:frontend/presentation/screens/chat/pages/animation_page.dart';
-import 'package:frontend/presentation/screens/chat/pages/chat_page.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 

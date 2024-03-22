@@ -167,7 +167,7 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
               child: TextButton(
                 onPressed: () async {
                   await saveChatIdToLocalStorage(chat.id).then((_) {
-                    _messageCubit.getMessagesByChatId(chat.id);
+                    _messageCubit.updateChatId(chat.id);
                     Navigator.pop(context);
                   });
                 },
@@ -192,8 +192,6 @@ class _CustomNavigationDrawerState extends State<CustomNavigationDrawer> {
                 }
                 _chatBloc.add(ChatDeleted(chat.id));
                 _messageCubit.deleteMessagesByChatId(chat.id);
-                // TODO: Keep on same chat after deleting other chats that is not currently opened
-                // _messageCubit.getMessagesByChatId(chat.id);
               });
             },
             icon: const Icon(Icons.delete),

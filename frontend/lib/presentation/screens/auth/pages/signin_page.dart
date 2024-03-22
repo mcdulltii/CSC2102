@@ -6,7 +6,6 @@ import 'package:frontend/presentation/helpers/navigate_with_transition.dart';
 import 'package:frontend/presentation/screens/auth/components/custom_scaffold.dart';
 import 'package:frontend/presentation/screens/auth/pages/signup_page.dart';
 import 'package:frontend/presentation/screens/chat/pages/animation_page.dart';
-import 'package:frontend/presentation/screens/chat/pages/chat_page.dart';
 import 'package:frontend/presentation/theme/theme.dart';
 
 class SignInPage extends StatefulWidget {

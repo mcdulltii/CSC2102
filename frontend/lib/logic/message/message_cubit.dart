@@ -1,10 +1,9 @@
 import 'package:bloc/bloc.dart';
-import 'package:flutter/material.dart';
 import 'package:frontend/logic/tts/tts_cubit.dart';
 import 'package:frontend/data/model/message.dart';
 import 'package:frontend/data/repository/chat/message_repository.dart';
 import 'package:frontend/logic/helper/chat_helper.dart';
-import 'package:frontend/presentation/screens/chat/pages/animation_page.dart';
+
 part 'message_state.dart';
 
 class MessageCubit extends Cubit<MessageState> {
@@ -49,15 +48,22 @@ class MessageCubit extends Cubit<MessageState> {
     }
   }
 
-  Future<void> getMessagesByChatId(String chatId) async {
+  void updateChatId(String chatId) {
+    if (chatId != currChatId) {
+      currChatId = chatId;
+      getMessagesByChatId();
+    }
+  }
+
+  Future<void> getMessagesByChatId() async {
     emit(MessageQueryLoading());
     // clear previous chat messages
     messages = [];
-    currChatId = chatId;
 
     try {
-      final fetchedMessages = await repo.getAllChatsByChatId(chatId);
+      final fetchedMessages = await repo.getAllChatsByChatId(currChatId);
       messages = fetchedMessages;
+      print(messages.length);
       botLastMessage = messages.last.payload.trim();
       emit(MessageQueryLoaded(text: botLastMessage));
     } catch (e) {
@@ -68,13 +74,16 @@ class MessageCubit extends Cubit<MessageState> {
   Future<void> deleteMessagesByChatId(String chatId) async {
     // call repo to backend to delete messages
     await repo.deleteAllChatsByChatId(chatId);
-    await getMessagesByChatId(currChatId);
+    await getMessagesByChatId();
+
+    isChatSelected();
   }
 
   Future<void> isChatSelected() async {
     final chatId = await getChatIdFromLocalStorage();
 
     if (chatId == null) {
+      print('isChatSelected: MessagesEmtpy');
       emit(MessagesEmpty());
     } else {
       emit(MessageQueryLoaded(text: botLastMessage));
